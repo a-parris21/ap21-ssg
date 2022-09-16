@@ -1,4 +1,4 @@
-import {genHtml} from './helpers.js';
+import {genIndexHtml} from './helpers.js';
 import {program} from 'commander';
 
 program
@@ -20,5 +20,5 @@ if (program.opts().help)
 
 if (program.opts().input)
 {
-    genHtml();
+    genIndexHtml();
 }
