@@ -1,4 +1,4 @@
-import {genHtml} from './helperFuncs.js';
+import {genHtml} from './helpers.js';
 import {program} from 'commander';
 
 program
