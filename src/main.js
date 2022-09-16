@@ -1,4 +1,4 @@
-//import {genHtml} from './generateHtml.js';
+import {genHtml} from './helperFuncs.js';
 import {program} from 'commander';
 
 program
