@@ -1,29 +1,12 @@
 import fs from 'fs';
 import { path } from 'path';
-import { rawListeners } from 'process';
 import { readline } from 'readline';
-import { addAbortSignal } from 'stream';
 
 const dist_path = '../dist';
 
-const htmlTemplateStart =
-`<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>`;
+var bookNames = new Array();
 
-const htmlTemplateMiddle =
-`</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-</head>
-<body>`;
-
-const htmlTemplateEnd = 
-`</body>
-</html>`;
-
-export function genIndexHtml(inputStr)
+export function generateWebsite(inputStr)
 {
     // Filepath for the output directory.
     const output_dir = makeDistFolder();
@@ -33,24 +16,36 @@ export function genIndexHtml(inputStr)
 
     // Check whether the pathname points to a single file or a directory
     fs.lstat(inputStr, (err, stats) => {
-        // use 'stats' to check if dir or file
-
         // If the pathname points to a file
         if (stats.isFile()) {
             if (isTxtFile(fileName))
             {
                 readFile(inputStr).then((result) => {
-                    writeFile()
+                    writeFile(fileName, result);
+                    generateIndexHtmlFile(book_names);
                 });
             }
         }
         // Otherwise
         else {
+            fs.readdir(inputStr, (err, fileNames) => {
+
+                fileNames.forEach((oneFileName) => {
+                    
+                    if (isTxtFile(fileName))
+                    {
+                        readFile(inputStr).then((result) => {
+                            writeFile(fileName, result);
+                        });
+                    }
+
+                })
+
+                generateIndexHtmlFile(book_names);
+            });
         }
     });
 }
-
-function genHtmlText()
 
 function makeDistFolder() {
     // If the /dist directory exists, remove the folder and all of its contents
@@ -110,6 +105,9 @@ function readBookFile(filePath) {
                 // Set the title and set 'titleFound' to TRUE
                 contents.title = textBlock;
                 titleFound = true;
+
+                // Append the book's title to the 'bookTitles' array
+                bookNames.push(textBlock);
                 
                 // Set 'textBlock' to the next line.
                 textBlock = line;
@@ -145,12 +143,68 @@ function readBookFile(filePath) {
 function writeBookFile(fileName, data) {
     return new Promise(async, (res, rej) => {
         var htmlFilePath = dist_path + getFileNameNoExt(fileName) + '.html';
-        var title = data.title;
-        var content = "";
-        var lineNumber = 0;
+        var body_str = "";
 
+        for (let i = 0; i < data.paragraphs.length; i++) {
+            if (i > 0) {
+                body_str += "<br/>";
+            }
+            body_str += data.paragraphs[i];
+        }
+        
+        content = htmlTemplateStart + title + htmlTemplateMiddle;
+        content += htmlTemplateEnd;
 
+        const htmlStr =
+            `<!doctype html>
+            <html lang="en">
+            <head>
+            <meta charset="utf-8">
+            <title>${data.title}</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            </head>
+            <body>
+            <h1>${data.title}</h1>
+            ${body_str}
+            </body>
+            </html>`;
+
+        // Write the html file contents ('htmlStr') to the specified file path
+        fs.writeFile(htmlFilePath, htmlStr);
+
+        res(htmlFilePath);
     });
+}
+
+// Generates the index.html file.
+function generateIndexHtmlFile(books) {
+    const indexFilePath = dist_path + "/index.html";
+    const indexTitle = "AP21 SSG";
+
+    // Generate the head and the beginning of the body elements for the index.html file.
+    var htmlStr = 
+    `<!doctype html>
+    <html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <title>${indexTitle}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body>`;
+    
+    // Create an unordered list of hyperlinks for each of the books in the array.
+    for (let i=0; i < books.length; i++) {
+        htmlStr += 
+        `<li><ul>
+        <a href="${dist_path}/${books[i]}.html">${books[i]}</a>
+        </ul></li>`;
+    }
+    
+    // Finish the html string.
+    htmlStr += `</body></html>`;
+
+    // Write the html file contents ('htmlStr') to the specified file path
+    fs.writeFile(indexFilePath, htmlStr);
 }
 
 // Accepts the name of a file as a string literal. Returns TRUE if it is a .txt file, else returns FALSE.
