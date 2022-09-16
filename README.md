@@ -1,2 +1,7 @@
 # ap21-ssg
-repos for DPS909 release 0.1
+
+Static Site Generator for DPS909-NSA.
+
+## Requirements
+
+- NodeJS
