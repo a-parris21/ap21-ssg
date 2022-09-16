@@ -20,5 +20,5 @@ if (program.opts().help)
 
 if (program.opts().input)
 {
-    genIndexHtml(`${program.opts().input}`);
+    generateWebsite(`${program.opts().input}`);
 }

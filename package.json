@@ -22,5 +22,6 @@
   "bugs": {
     "url": "https://github.com/a-parris21/ap21-ssg/issues"
   },
+  "type": "module",
   "homepage": "https://github.com/a-parris21/ap21-ssg#readme"
 }
