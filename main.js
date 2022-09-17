@@ -1,3 +1,5 @@
+#! /usr/bin/env node
+
 import {generateWebsite} from './helpers.js';
 import {program} from 'commander';
 
@@ -10,12 +12,12 @@ program.parse(process.argv);
 
 if (program.opts().version)
 {
-    console.log("version: 0.1");
+    console.log("Version: 0.1");
 }
 
 if (program.opts().help)
 {
-    console.log("version: 0.1");
+    console.log("pending help message");
 }
 
 if (program.opts().input)

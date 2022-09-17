@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import readline from 'readline';
 
-const dist_path = '../dist';
+const dist_path = './dist';
 
 var bookNames = new Array();
 
