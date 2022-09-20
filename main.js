@@ -1,26 +1,44 @@
 #! /usr/bin/env node
 
 import {generateWebsite} from './helpers.js';
-import {program} from 'commander';
+//import {program} from 'commander';
+import { Command } from 'commander';
+const program = new Command();
+
+//console.log("test");
 
 program
-.option('--version, -v', 'displays the version number')
-.option('--help, -h', 'displays help message')
-.option('--input, -i', 'get input from a specified file or folder');
+.option('-v --version', 'displays the version number')
+.option('-h --help', 'displays help message')
+.option('-i --input', 'get input from a specified file or folder');
 
 program.parse(process.argv);
 
-if (program.opts().version)
+const options = program.opts();
+
+if (options.version)
 {
     console.log("Version: 0.1");
 }
 
-if (program.opts().help)
+if (options.help)
 {
-    console.log("pending help message");
+    //console.log(generateHelpMessage());
+    //console.log(`does this put in a new line`);
 }
 
-if (program.opts().input)
+if (options.input)
 {
     generateWebsite(`${program.opts().input}`);
+}
+
+function generateHelpMessage()
+{
+    var helpMsg;
+
+    helpMsg = 
+    `
+    `;
+
+    return helpMsg;
 }
