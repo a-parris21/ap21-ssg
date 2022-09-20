@@ -12,7 +12,12 @@ All version numbers listed are the recommended versions, though please note that
 - `NPM` v6.14.0 or higher.
 
 ## Installation
-To install this program, first close the repository to your local machine `git clone <URL_to_this_repo> <destination_directory_file_path>`.
+To install this program, first clone the repository to your local machine. This can be done in several ways, though I recommend using the VSC CLI. `git clone <URL_to_this_repo> <destination_directory_file_path>`.
+
+### Examples
+- Windows: `~\Documents\dps909\rel_01\ap21-ssg`
+
+- Mac/Linux: `~/Documents/dps909/rel_01/ap21-ssg`
 
 Next, open a terminal inside of the newly created folder (this can be via VSC, Windows CMD or Windows PowerShell).
 

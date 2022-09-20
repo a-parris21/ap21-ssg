@@ -1,11 +1,12 @@
 {
   "name": "ap21-ssg",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "ssg tool written in js",
   "main": "main.js",
   "dependencies": {
     "commander": "^9.4.0",
     "fs": "0.0.1-security",
+    "nexe": "^4.0.0-rc.1",
     "path": "^0.12.7",
     "readline": "^1.3.0"
   },
