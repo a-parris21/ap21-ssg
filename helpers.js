@@ -9,13 +9,16 @@ var bookNames = new Array();
 export function generateWebsite(inputStr)
 {
     // Filepath for the output directory.
-    const output_dir = makeDistFolder();
+    //const output_dir = makeDistFolder();
 
     // Get the filename from the full pathname.
     const fileName = path.basename(inputStr);
-
+    console.log("inputStr = ", inputStr);
     // Check whether the pathname points to a single file or a directory
-    fs.lstat(inputStr, (err, stats) => {
+    fs.stat(inputStr, (err, stats) => {
+    //fs.lstat(inputStr, (err, stats) => {
+        console.log("stats = \n", stats);
+        /*
         // If the pathname points to a file
         if (stats.isFile()) {
             if (isTxtFile(fileName))
@@ -44,6 +47,7 @@ export function generateWebsite(inputStr)
                 generateIndexHtmlFile(book_names);
             });
         }
+        */
     });
 }
 
