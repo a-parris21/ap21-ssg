@@ -1,14 +1,13 @@
-#! /usr/bin/env node
+// #! /usr/bin/env node
 
 import {generateWebsite} from './helpers.js';
-//import {program} from 'commander';
 import { Command } from 'commander';
 const program = new Command();
 
 //console.log("test");
 
 program
-.option('-v --version', 'displays the version number')
+.option('-v --version', 'displays the program name & version number')
 .option('-h --help', 'displays help message')
 .option('-i --input', 'get input from a specified file or folder');
 
@@ -18,13 +17,13 @@ const options = program.opts();
 
 if (options.version)
 {
-    console.log("Version: 0.1");
+    console.log("Version: 0.1.0");
 }
 
 if (options.help)
 {
     //console.log(generateHelpMessage());
-    //console.log(`does this put in a new line`);
+    console.log(`Usage: ./`);
 }
 
 if (options.input)
