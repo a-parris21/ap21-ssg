@@ -3,11 +3,11 @@
 ## Overview
 
 This tool is a static site generator (SSG) written in JavaScript and can be run from the Windows CMD or PowerShell.
-This SSG allows the user to specify a `.txt` file (or a directory of `.txt` files) as input for the program, which will then generate HTML files for each `.txt` file inputted.
+This SSG allows the user to specify a `.txt` or `.md` file (or a directory of `.txt` or `.md` files types) as input for the program, which will then generate HTML files for each `.txt` file inputted.
 
 ## Requirements
 
-All version numbers listed are the recommended versions, though please note that updated/newer versios
+All version numbers listed are the recommended versions, though please note that updated/newer version
 
 -   `Node.js` v14.3.0 or higher.
 -   `NPM` v6.14.0 or higher.
@@ -34,6 +34,8 @@ Then, run `npm install` to install the node module dependencies.
 
 There are three CLI options available to the user with this program.
 
+-   **node main.js -i "./files/lab2.md"** to parse out the bold data from the `md` files and convert it to `html5` pages
+
 ## Examples
 
 Cloning the Repository
@@ -47,3 +49,4 @@ Cloning the Repository
 ## New feature
 
 -   Added the new feature in the SSG to deal with the .md file type and convert them to .html file type.
+-   To use this feature use this command **node main.js -i "./files/lab2.md"**.
