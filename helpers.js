@@ -8,12 +8,18 @@ var bookNames = new Array();
 
 export function generateWebsite(inputStr)
 {
-    // Filepath for the output directory.
-    const output_dir = makeDistFolder();
+  
+	if (fs.existsSync(dist_path)) {
+		fs.rmSync(dist_path, { recursive: true, force: true });
+	}
 
+	if (!fs.existsSync(dist_path)) {
+		fs.mkdirSync(dist_path);
+	}
     // Get the filename from the full pathname.
     const fileName = path.basename(inputStr);
 
+    /*
     // Check whether the pathname points to a single file or a directory
     fs.lstat(inputStr, (err, stats) => {
         // If the pathname points to a file
@@ -22,7 +28,7 @@ export function generateWebsite(inputStr)
             {
                 readFile(inputStr).then((result) => {
                     writeFile(fileName, result);
-                    generateIndexHtmlFile(book_names);
+                    generateIndexHtmlFile(inputStr);
                 });
             }
         }
@@ -40,11 +46,56 @@ export function generateWebsite(inputStr)
                     }
 
                 })
-
-                generateIndexHtmlFile(book_names);
+                generateIndexHtmlFile(inputStr);
             });
         }
     });
+    */
+
+	fs.lstat(inputStr, (err, stats) => {
+		if (err) {
+			console.log(err);
+			return;
+		} else {
+			if (stats.isDirectory()) {
+				fs.readdir(inputStr, (err, files) => {
+					files.forEach((fileN) => {
+						if (err) {
+							console.log(err);
+							return;
+						}
+						if (path.extname(fileN) == '.txt') {
+							readBookFile(inputStr + '/' + fileN).then(function (data) {
+								writeBookFile(fileN, data);
+							});
+						}else{
+                            console.log(".md file found");
+                            readBookFileMD(inputStr + '/' + fileN).then (function (data){
+                                writeBookFile(fileN, data);
+                            }, function (err){
+                                console.log(err);
+                            });
+                        }
+					});
+					generateIndexHtmlFile(files, true);
+				});
+			} else {
+				if (path.extname(fileName) == '.txt') {
+					readBookFile(inputStr).then((data) => {
+						writeBookFile(fileName, data);
+						generateIndexHtmlFile(inputStr);
+					});
+				}else{
+                    console.log(".md file found");
+                    readBookFileMD(inputStr).then (function (data){
+                        writeBookFile(fileName, data);
+                    }, function (err){
+                        console.log(err);
+                    });
+                }
+			}
+		}
+	});
 }
 
 function makeDistFolder() {
@@ -70,17 +121,25 @@ function makeDistFolder() {
 
 // Accepts the name of a file as a string literal. Reads the file line by line and returns a object containing the file's contents.
 function readBookFile(filePath) {
-    return new Promise(async, (res, rej) => {
+    return new Promise(async (res, rej) => {
+        let array = [];
         var contents = {
             title: "",
             paragraphs: new Array()
         };
         
-        const fileReadStream = fs.createReadStream(filePath);
-        var lineStr = readline.createInterface({ 
-            input: fileReadStream 
-        });
+        const fileReadStream = readline.createInterface({input: fs.createReadStream(filePath),})
 
+        for await (const line of fileReadStream) {
+            if (line != '') {
+                array.push(line);
+            } else {
+                array.push(line);
+            }
+        }
+          res(array);
+
+        /*
         // variable to track the number of empty lines
         let emptyLines = 0;
 
@@ -134,14 +193,14 @@ function readBookFile(filePath) {
                 textBlock += (' ' + line);
             }
         });
-
-        res(contents);
+    */
+      
     });
 }
 
 // Accepts the contents of a file as a string literal. Creates an HTML file containing the content.
 function writeBookFile(fileName, data) {
-    return new Promise(async, (res, rej) => {
+    return new Promise( (res, rej) => {
         var htmlFilePath = dist_path + getFileNameNoExt(fileName) + '.html';
         var body_str = "";
 
@@ -152,8 +211,8 @@ function writeBookFile(fileName, data) {
             body_str += data.paragraphs[i];
         }
         
-        content = htmlTemplateStart + title + htmlTemplateMiddle;
-        content += htmlTemplateEnd;
+       // content = htmlTemplateStart + title + htmlTemplateMiddle;
+        //content += htmlTemplateEnd;   
 
         const htmlStr =
             `<!doctype html>
@@ -170,7 +229,12 @@ function writeBookFile(fileName, data) {
             </html>`;
 
         // Write the html file contents ('htmlStr') to the specified file path
-        fs.writeFile(htmlFilePath, htmlStr);
+        fs.writeFile(htmlFilePath, htmlStr, (err)=>{
+            if (err) {
+                console.log(err);
+            }
+            console.log('file created ' + fileName);
+        });
 
         res(htmlFilePath);
     });
@@ -204,7 +268,12 @@ function generateIndexHtmlFile(books) {
     htmlStr += `</body></html>`;
 
     // Write the html file contents ('htmlStr') to the specified file path
-    fs.writeFile(indexFilePath, htmlStr);
+    fs.writeFile(indexFilePath, htmlStr, (err) => {
+        if (err) {
+            console.log(err);
+        }
+        console.log("File created");
+    });
 }
 
 // Accepts the name of a file as a string literal. Returns TRUE if it is a .txt file, else returns FALSE.

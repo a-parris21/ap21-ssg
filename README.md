@@ -7,17 +7,20 @@ This SSG allows the user to specify a `.txt` file (or a directory of `.txt` file
 
 ## Requirements
 
-All version numbers listed are the recommended versions, though please note that updated/newer versios 
-- `Node.js` v14.3.0 or higher.
-- `NPM` v6.14.0 or higher.
+All version numbers listed are the recommended versions, though please note that updated/newer versios
+
+-   `Node.js` v14.3.0 or higher.
+-   `NPM` v6.14.0 or higher.
 
 ## Installation
+
 To install this program, first clone the repository to your local machine. This can be done in several ways, though I recommend using the VSC CLI. `git clone <URL_to_this_repo> <destination_directory_file_path>`.
 
 ### Examples
-- Windows: `~\Documents\dps909\rel_01\ap21-ssg`
 
-- Mac/Linux: `~/Documents/dps909/rel_01/ap21-ssg`
+-   Windows: `~\Documents\dps909\rel_01\ap21-ssg`
+
+-   Mac/Linux: `~/Documents/dps909/rel_01/ap21-ssg`
 
 Next, open a terminal inside of the newly created folder (this can be via VSC, Windows CMD or Windows PowerShell).
 
@@ -25,7 +28,7 @@ Then, run `npm install` to install the node module dependencies.
 
 ## Usage
 
-- 
+-
 
 ## Options
 
@@ -38,5 +41,9 @@ Cloning the Repository
 
 ## Optional features developed
 
-- Parsing the title from the file.
-- Auto-generate an `index.html` file if the user specifies a folder for input.
+-   Parsing the title from the file.
+-   Auto-generate an `index.html` file if the user specifies a folder for input.
+
+## New feature
+
+-   Added the new feature in the SSG to deal with the .md file type and convert them to .html file type.
