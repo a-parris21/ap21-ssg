@@ -301,3 +301,38 @@ function getFileNameNoExt(fileName) {
     return str;
 }
 
+// lab 2 work here
+// made the changes on the above functions to make it work with the new lab 2 requirements
+// fe bugs in the code, but it works for the most part
+// please review my changes
+
+//new function to deal with .md files
+
+function  readBookFileMD(fileName) {
+    return new Promise((res, rej) => {
+        // create a read stream
+        const fileReadStream = fs.createReadStream(fileName, 'utf8');
+        // create an array to store the lines
+        const array = [];
+        // md pattern
+        const mdPattern = /\*\*(.*)\*\*/g;
+        // read the file line by line
+        
+        for await (const line of fileReadStream) {
+            if (line != '') {
+                do {
+                    // match the pattern
+                    var match = mdPattern.exec(line);
+                    if (match) {
+                        // push the match to the array
+                        console.log(match[1]);
+                        array.push(match[1]);
+                    }
+                } while (match);
+            } else {
+                
+            }
+        }
+        res(array);
+    });
+}
