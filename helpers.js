@@ -69,7 +69,7 @@ export function generateWebsite(inputStr)
 								writeBookFile(fileN, data);
 							});
 						}else{
-                            console.log(".md file found");
+                            //console.log(".md file found");
                             readBookFileMD(inputStr + '/' + fileN).then (function (data){
                                 writeBookFile(fileN, data);
                             }, function (err){
@@ -86,7 +86,7 @@ export function generateWebsite(inputStr)
 						generateIndexHtmlFile(inputStr);
 					});
 				}else{
-                    console.log(".md file found");
+                    //console.log(".md file found");
                     readBookFileMD(inputStr).then (function (data){
                         writeBookFile(fileName, data);
                     }, function (err){
@@ -203,14 +203,21 @@ function writeBookFile(fileName, data) {
     return new Promise( (res, rej) => {
         var htmlFilePath = dist_path + getFileNameNoExt(fileName) + '.html';
         var body_str = "";
-
-        for (let i = 0; i < data.paragraphs.length; i++) {
+        // getting the error here commented out for now and used mine to test mine .md work
+        /*for (let i = 0; i < data.paragraphs.length; i++) {
             if (i > 0) {
                 body_str += "<br/>";
             }
             body_str += data.paragraphs[i];
         }
-        
+        */
+        for (var line of data) {
+			if (line !== '\n') {
+				content += `<p>${line}</p>`;
+			} else {
+				content += '\n';
+			}
+		}
        // content = htmlTemplateStart + title + htmlTemplateMiddle;
         //content += htmlTemplateEnd;   
 
@@ -317,8 +324,8 @@ function  readBookFileMD(fileName) {
         // md pattern
         const mdPattern = /\*\*(.*)\*\*/g;
         // read the file line by line
-        
-        for await (const line of fileReadStream) {
+        (async () => {
+        for await (const line of fileReadStream)  {
             if (line != '') {
                 do {
                     // match the pattern
@@ -333,7 +340,8 @@ function  readBookFileMD(fileName) {
                 // push the line to the array
                 array.push(line);
             }
-        }
+            }
+        })();
         res(array);
     });
 }
