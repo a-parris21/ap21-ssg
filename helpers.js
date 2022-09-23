@@ -330,7 +330,8 @@ function  readBookFileMD(fileName) {
                     }
                 } while (match);
             } else {
-                
+                // push the line to the array
+                array.push(line);
             }
         }
         res(array);
