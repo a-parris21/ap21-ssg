@@ -134,7 +134,7 @@ function readBookFile(filePath) {
             if (line != '') {
                 array.push(line);
             } else {
-                array.push(line);
+                array.push('<br>');
             }
         }
           res(array);
