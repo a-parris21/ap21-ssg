@@ -13,9 +13,9 @@ program
 	.option('-v --version', 'displays the program name & version number')
 	.option('-h --help', 'displays help message');
 
-.option('-v --version', 'display the program name & version number')
+/*.option('-v --version', 'display the program name & version number')
 .option('-h --help', 'display help message')
-.option('-i --input', 'get input from a specified file or folder');
+.option('-i --input', 'get input from a specified file or folder');*/
 
 
 program.parse(process.argv);
@@ -36,12 +36,6 @@ if (program.opts().input) {
 	console.log('input: ' + program.opts().input);
 	generateWebsite(`${program.opts().input}`);
 }
-
-function generateHelpMessage() {
-	var helpMsg;
-
-	helpMsg = `
-    `;
 
 if (options.version)
 {

@@ -33,7 +33,7 @@ export function generateWebsite(inputStr)
     fs.stat(inputStr, (err, stats) => {
     //fs.lstat(inputStr, (err, stats) => {
         console.log("stats = \n", stats);
-        /*
+        
         // If the pathname points to a file
         if (stats.isFile()) {
             if (isTxtFile(fileName))
@@ -61,8 +61,9 @@ export function generateWebsite(inputStr)
                 generateIndexHtmlFile(inputStr);
             });
         }
-        */
+        
     });
+
     */
 
 	fs.lstat(inputStr, (err, stats) => {
@@ -227,9 +228,9 @@ function writeBookFile(fileName, data) {
         */
         for (var line of data) {
 			if (line !== '\n') {
-				content += `<p>${line}</p>`;
+				body_str += `<p>${line}</p>`;
 			} else {
-				content += '\n';
+				body_str += '\n';
 			}
 		}
        // content = htmlTemplateStart + title + htmlTemplateMiddle;
