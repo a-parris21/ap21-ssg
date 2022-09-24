@@ -135,6 +135,7 @@ function readBookFile(filePath) {
                 array.push(line);
             } else {
                 array.push('<br>');
+             
             }
         }
           res(array);
