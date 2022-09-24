@@ -1,4 +1,4 @@
-# ap21-ssg
+# AP21-SSG
 
 ## Overview
 
@@ -13,6 +13,7 @@ All version numbers listed are the recommended versions, though please note that
 -   `NPM` v6.14.0 or higher.
 
 ## Installation
+
 
 To install this program, first clone the repository to your local machine. This can be done in several ways, though I recommend using the VSC CLI. `git clone <URL_to_this_repo> <destination_directory_file_path>`.
 
@@ -40,6 +41,27 @@ There are three CLI options available to the user with this program.
 
 Cloning the Repository
 `git clone https://github.com/a-parris21/ap21-ssg C:\Users\<username>\Documents\ap21-ssg`
+
+To install this program, either clone the repository to your local machine or download the code as a `.zip` archive.
+
+Next, navigate to the directory where the files from this repos were cloned/saved.
+Open a CLI terminal and run `npm install` to install the node module dependencies.
+
+## Usage
+Execute `main.js [options]` in the directory where `main.js` is located.  
+Note that on Windows you may need to prefix this with the Node interpreter, `node /main.js [options]`.
+
+## Options
+| Long      | Short | Description                                                                               |
+| --------- | ----- | ----------------------------------------------------------------------------------------- |
+| --help    | -h    | Displays the help message.                                                                    |
+| --input   | -i    | Specify file or folder for input. In case of folder will generate recurseively? |
+| --version | -v    | Prints the version number.                                                                |  
+### Examples
+- `main.js --input ./input_data/`
+- `main.js -i ./input_data/Sherlock-Holmes-Selected-Stories/`
+- `main.js -i ./input_data/Sherlock-Holmes-Selected-Stories/Silver Blaze.txt`
+
 
 ## Optional features developed
 
