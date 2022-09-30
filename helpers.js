@@ -8,107 +8,90 @@ var bookNames = new Array();
 
 export function generateWebsite(inputStr)
 {
-
-  
+    // If the 'dist' dir already exists, remove it.
 	if (fs.existsSync(dist_path)) {
 		fs.rmSync(dist_path, { recursive: true, force: true });
 	}
 
+    // If the 'dist' dir doesn't exist, create it.
 	if (!fs.existsSync(dist_path)) {
 		fs.mkdirSync(dist_path);
 	}
-    // Get the filename from the full pathname.
-    const fileName = path.basename(inputStr);
-
-    /*
-
-    // Filepath for the output directory.
-    //const output_dir = makeDistFolder();
 
     // Get the filename from the full pathname.
     const fileName = path.basename(inputStr);
-    console.log("inputStr = ", inputStr);
 
-    // Check whether the pathname points to a single file or a directory
-    fs.stat(inputStr, (err, stats) => {
-    //fs.lstat(inputStr, (err, stats) => {
-        console.log("stats = \n", stats);
-        
-        // If the pathname points to a file
-        if (stats.isFile()) {
-            if (isTxtFile(fileName))
-            {
-                readFile(inputStr).then((result) => {
-                    writeFile(fileName, result);
-                    generateIndexHtmlFile(inputStr);
-                });
-            }
-        }
-        // Otherwise
-        else {
-            fs.readdir(inputStr, (err, fileNames) => {
-
-                fileNames.forEach((oneFileName) => {
-                    
-                    if (isTxtFile(fileName))
-                    {
-                        readFile(inputStr).then((result) => {
-                            writeFile(fileName, result);
-                        });
-                    }
-
-                })
-                generateIndexHtmlFile(inputStr);
-            });
-        }
-        
-    });
-
-    */
-
+    // Check whether the filepath is a single file or a folder.
 	fs.lstat(inputStr, (err, stats) => {
+        // Check for any errors.
 		if (err) {
 			console.log(err);
 			return;
-		} else {
+		}
+        else {
+            // If a folder was specified, parse each file individually.
 			if (stats.isDirectory()) {
 				fs.readdir(inputStr, (err, files) => {
-					files.forEach((fileN) => {
+
+					files.forEach((oneFile) => {
 						if (err) {
 							console.log(err);
 							return;
 						}
-						if (path.extname(fileN) == '.txt') {
-							readBookFile(inputStr + '/' + fileN).then(function (data) {
-								writeBookFile(fileN, data);
-							});
-						}else{
-                            //console.log(".md file found");
-                            readBookFileMD(inputStr + '/' + fileN).then (function (data){
-                                writeBookFile(fileN, data);
-                            }, function (err){
+                        // If the file is a '.txt' file, call 'readBookFileTxt'
+						else if (path.extname(oneFile) == '.txt') {
+                            console.log(".txt file found");
+
+							readBookFileTxt(inputStr + '/' + oneFile)
+                            .then(function (data) {
+								writeBookFile(oneFile, data);
+							}).catch(function (err) {
+                                console.log(err);
+                            });
+						}
+                        // If the file is an '.md' file, call 'readBookFileMd'
+                        else if (path.extname(oneFile) == '.md') {
+                            console.log(".md file found");
+
+                            /*readBookFileMd(inputStr + '/' + oneFile).then(function (data) {
+                                writeBookFile(oneFile, data);
+                            }, function (err) {
+                                console.log(err);
+                            });*/
+                            readBookFileMd(inputStr + '/' + oneFile)
+                            .then(function (data) {
+                                writeBookFile(oneFile, data);
+                            }).catch(function (err) {
                                 console.log(err);
                             });
                         }
+                        else {
+                            console.log("neither .txt nor .md file, cannot parse");
+                        }
 					});
+
 					generateIndexHtmlFile(files, true);
 				});
-			} else {
+			}
+            // Otherwise, if the filepath was a single file.
+            else {
 				if (path.extname(fileName) == '.txt') {
-					readBookFile(inputStr).then((data) => {
+
+					readBookFileTxt(inputStr).then((data) => {
 						writeBookFile(fileName, data);
 						generateIndexHtmlFile(inputStr);
 					});
-				}else{
-                    //console.log(".md file found");
-                    readBookFileMD(inputStr).then (function (data){
+				}
+                else {
+                    console.log(".md file found");
+                    readBookFileMd(inputStr).then (function (data){
                         writeBookFile(fileName, data);
                     }, function (err){
                         console.log(err);
                     });
                 }
 			}
-		}
+		} // end else no errors
 	});
 }
 
@@ -134,7 +117,7 @@ function makeDistFolder() {
 }
 
 // Accepts the name of a file as a string literal. Reads the file line by line and returns a object containing the file's contents.
-function readBookFile(filePath) {
+function readBookFileTxt(filePath) {
     return new Promise(async (res, rej) => {
         let array = [];
         var contents = {
@@ -216,7 +199,7 @@ function readBookFile(filePath) {
 // Accepts the contents of a file as a string literal. Creates an HTML file containing the content.
 function writeBookFile(fileName, data) {
     return new Promise( (res, rej) => {
-        var htmlFilePath = dist_path + getFileNameNoExt(fileName) + '.html';
+        var htmlFilePath = dist_path + "/" + getFileNameNoExt(fileName) + '.html';
         var body_str = "";
         // getting the error here commented out for now and used mine to test mine .md work
         /*for (let i = 0; i < data.paragraphs.length; i++) {
@@ -330,7 +313,7 @@ function getFileNameNoExt(fileName) {
 
 //new function to deal with .md files
 
-function  readBookFileMD(fileName) {
+function  readBookFileMd(fileName) {
     return new Promise((res, rej) => {
         // create a read stream
         const fileReadStream = fs.createReadStream(fileName, 'utf8');
