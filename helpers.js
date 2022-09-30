@@ -1,4 +1,4 @@
-import fs from 'fs';
+import fs, { stat } from 'fs';
 import path from 'path';
 import readline from 'readline';
 
@@ -8,27 +8,19 @@ var bookNames = new Array();
 
 export function generateWebsite(inputStr)
 {
-    // If the 'dist' dir already exists, remove it.
-	if (fs.existsSync(dist_path)) {
-		fs.rmSync(dist_path, { recursive: true, force: true });
-	}
-
-    // If the 'dist' dir doesn't exist, create it.
-	if (!fs.existsSync(dist_path)) {
-		fs.mkdirSync(dist_path);
-	}
+    makeDistFolder();
 
     // Get the filename from the full pathname.
     const fileName = path.basename(inputStr);
 
     // Check whether the filepath is a single file or a folder.
 	fs.lstat(inputStr, (err, stats) => {
-        // Check for any errors.
 		if (err) {
 			console.log(err);
 			return;
 		}
         else {
+            console.log("isDir = " + stats.isDirectory() + " | isFile = " + stats.isFile());
             // If a folder was specified, parse each file individually.
 			if (stats.isDirectory()) {
 				fs.readdir(inputStr, (err, files) => {
@@ -38,18 +30,15 @@ export function generateWebsite(inputStr)
 							console.log(err);
 							return;
 						}
-                        // If the file is a '.txt' file, call 'readBookFileTxt'
 						else if (path.extname(oneFile) == '.txt') {
-                            console.log(".txt file found");
-
 							readBookFileTxt(inputStr + '/' + oneFile)
                             .then(function (data) {
 								writeBookFile(oneFile, data);
-							}).catch(function (err) {
+							})
+                            .catch(function (err) {
                                 console.log(err);
                             });
 						}
-                        // If the file is an '.md' file, call 'readBookFileMd'
                         else if (path.extname(oneFile) == '.md') {
                             console.log(".md file found");
 
@@ -73,22 +62,31 @@ export function generateWebsite(inputStr)
 					generateIndexHtmlFile(files, true);
 				});
 			}
-            // Otherwise, if the filepath was a single file.
+            // Otherwise, if the filepath was a single file then parse it.
             else {
 				if (path.extname(fileName) == '.txt') {
 
-					readBookFileTxt(inputStr).then((data) => {
+					readBookFileTxt(inputStr)
+                    .then((data) => {
 						writeBookFile(fileName, data);
-						generateIndexHtmlFile(inputStr);
-					});
-				}
-                else {
-                    console.log(".md file found");
-                    readBookFileMd(inputStr).then (function (data){
-                        writeBookFile(fileName, data);
-                    }, function (err){
+					})
+                    .catch(function (err) {
                         console.log(err);
                     });
+				}
+                else if (path.extname(oneFile) == '.md') {
+                    console.log(".md file found");
+
+                    readBookFileMd(inputStr)
+                    .then(function (data){
+                        writeBookFile(fileName, data);
+                    })
+                    .catch(function (err) {
+                        console.log(err);
+                    });
+                }
+                else {
+                    console.log("neither .txt nor .md file, cannot parse");
                 }
 			}
 		} // end else no errors
@@ -97,102 +95,90 @@ export function generateWebsite(inputStr)
 
 function makeDistFolder() {
     // If the /dist directory exists, remove the folder and all of its contents
-    if ( fs.existsSync(dist_path) )
-    {
-        fs.rmSync(dist_path, {
-            recursive: true,
-            force: true
-        });
-    }
+    if (fs.existsSync(dist_path)) {
+		fs.rmSync(dist_path, { recursive: true, force: true });
+	}
 
     // Create a new /dist directory, if it does not already exist.
     /* Note: This IF statement may be redundant, since the /dist folder should be deleted 
        by the above code block before execution reaches this line. */
-    if ( !fs.existsSync(dist_path) )
-    {
-        fs.mkdirSync(dist_path);
-    }
-
-    return dist_path;
+    if (!fs.existsSync(dist_path)) {
+		fs.mkdirSync(dist_path);
+	}
 }
 
 // Accepts the name of a file as a string literal. Reads the file line by line and returns a object containing the file's contents.
 function readBookFileTxt(filePath) {
     return new Promise(async (res, rej) => {
-        let array = [];
-        var contents = {
-            title: "",
-            paragraphs: new Array()
-        };
-        
-        const fileReadStream = readline.createInterface({input: fs.createReadStream(filePath),})
+        const fileReadStream = readline.createInterface({input: fs.createReadStream(filePath),});
 
-        for await (const line of fileReadStream) {
-            if (line != '') {
-                array.push(line);
-            } else {
-                array.push('<br>');
-             
+        var myBuffer = ""; // Buffer to hold lines read from the file.
+        var title = "";
+        var paragraph = "";
+        var htmlBody = "";
+        var counter = 0; // The number of consecutive empty lines found.
+
+        var arr = new Array();
+
+        let i = 0;
+        for await (const line of fileReadStream)
+        {
+            {/*
+            // If the line is NOT empty then append it to the buffer.
+            if (line.length > 0) {
+                if (myBuffer != "")
+                {
+                    // If 2 or more consecutive empty lines have been found and a title has NOT been set, then set the title.
+                    if ((counter >= 2) && (title == "")) 
+                    {
+                        title = myBuffer;
+                    }
+                    // If 1 empty line was found, then end the current paragraph and append it to 'htmlBody'.
+                    else if (counter == 1)
+                    {
+                        htmlBody += "<p>" + paragraph + "</p>";
+                        paragraph = "";
+                    }
+                    // Otherwise, append the buffer's contents to the current paragraph.
+                    else {
+                        paragraph += myBuffer + "<br/>";
+                    }
+                }
+
+                myBuffer = line;
+                counter = 0;
             }
-        }
-          res(array);
-
-        /*
-        // variable to track the number of empty lines
-        let emptyLines = 0;
-
-        // variable to hold the text before it is set as a paragraph or the title
-        let textBlock = "";
-
-        // variable to store a paragraph once it's been completely parsed
-        let oneParagraph = "";
-
-        // stores TRUE if the title has been found, FALSE otherwise
-        let titleFound = false;
-
-        // Read the file line by line
-        lineStr.on("line", (data) => {
-            // If the line is empty then increment the empty lines counter
-            if (line.length === 0) {
-                emptyLines++;
-            }
-            // If 2 or more consecutive empty lines are found AND the title has NOT been set, then set the title.
-            else if (!titleFound && emptyLines === 2)
-            {
-                // Set the title and set 'titleFound' to TRUE
-                contents.title = textBlock;
-                titleFound = true;
-
-                // Append the book's title to the 'bookTitles' array
-                bookNames.push(textBlock);
-                
-                // Set 'textBlock' to the next line.
-                textBlock = line;
-
-                // Reset the empty lines counter
-                emptyLines = 0;
-            }
-            // If any empty lines are found and the title has already been set then create a new paragraph.
-            else if (titleFound && emptyLines > 0 && emptyLines < 2) {
-                // Set 'paragraph' to an HTML string containing the completed paragraph in 'textBlock'.
-                oneParagraph = `<p>${textBlock}</p>`;
-
-                // Append the completed paragraph to 'contents.paragraphs'
-                contents.paragraphs.push(paragraph);
-
-                // Set 'textBlock' to the next line.
-                textBlock = line;
-
-                // Reset the empty lines counter
-                emptyLines = 0;
-            }
-            // Otherwise, append the current line to the text block.
+            // Otherwise, if it is empty, then increment 'counter'.
             else {
-                textBlock += (' ' + line);
+                counter++;
             }
-        });
-    */
-      
+            
+            console.log(`${i}: buffer = ${myBuffer}\ntitle = ${title}\nparagraph = ${paragraph}\nbody = ${htmlBody}\n--------------\n\n`);
+            i++;
+            */}
+
+            arr.push(line);
+        }
+
+        for (let i=0; i < arr.length; i++) {
+            console.log(`arr[${i}]: ${arr[i]}`);
+        }
+
+        var htmlString = `<!doctype html>
+        <html lang="en">
+        <head>
+            <meta charset="utf-8">
+            <title>${title}</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+        </head>
+        <body>
+            <h1>${title}</h1>
+            ${htmlBody}
+        </body>
+        </html>`;
+        //console.log("**\n" + htmlString + "*******************\n");
+
+        res(htmlString);
     });
 }
 
