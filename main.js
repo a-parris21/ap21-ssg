@@ -1,9 +1,11 @@
 // #! /usr/bin/env node
-const { version } = require('./package.json');
+
 import { generateWebsite, setHtmlLang } from './helpers.js';
 import { Command } from 'commander';
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
 const program = new Command();
-
+const { version } = require('./package.json');
 const help_message = generateHelpMessage();
 
 program.option('-i --input <item>', 'get input')
@@ -17,7 +19,7 @@ const options = program.opts();
 
 if (options.version)
 {
-    console.log(`${version}`);
+    console.log(`${ver}`);
 }
 
 if (options.help)
