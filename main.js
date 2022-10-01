@@ -1,41 +1,19 @@
 // #! /usr/bin/env node
-
+const { version } = require('./package.json');
 import { generateWebsite } from './helpers.js';
 import { Command } from 'commander';
 const program = new Command();
 
-//console.log("test");
 const help_message = generateHelpMessage();
 
-program
-
-	.option('-i --input <item>', 'get input')
+program.option('-i --input <item>', 'get input')
 	.option('-v --version', 'displays the program name & version number')
-	.option('-h --help', 'displays help message');
-
-/*.option('-v --version', 'display the program name & version number')
-.option('-h --help', 'display help message')
-.option('-i --input', 'get input from a specified file or folder');*/
-
+	.option('-h --help', 'displays help message')
+	.option('-l --lang', 'specify the language of the html documents');
 
 program.parse(process.argv);
 
 const options = program.opts();
-
-
-if (options.version) {
-	console.log('Version: 0.1.0');
-}
-
-if (options.help) {
-	//console.log(generateHelpMessage());
-	console.log(`Usage: ./`);
-}
-
-if (program.opts().input) {
-	console.log('input: ' + program.opts().input);
-	generateWebsite(`${program.opts().input}`);
-}
 
 if (options.version)
 {
@@ -50,6 +28,11 @@ if (options.help)
 if (options.input)
 {
     generateWebsite(`${options.input}`);
+}
+
+if (options.lang)
+{
+    generateWebsite(`${options.input}`); //modify this to accept a 2nd parameter
 }
 
 function generateHelpMessage()

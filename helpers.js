@@ -28,9 +28,9 @@ export function generateWebsite(inputStr)
 							return;
 						}
 						else if (path.extname(oneFile) == '.txt') {
-							readBookFileTxt(inputStr + '/' + oneFile)
+							readFileTxt(inputStr + '/' + oneFile)
                             .then(function (data) {
-								writeBookFile(oneFile, data);
+								writeFile(oneFile, data);
 							})
                             .catch(function (err) {
                                 console.log(err);
@@ -39,9 +39,9 @@ export function generateWebsite(inputStr)
                         else if (path.extname(oneFile) == '.md') {
                             console.log(".md file found");
 
-                            readBookFileMd(inputStr + '/' + oneFile)
+                            readFileMd(inputStr + '/' + oneFile)
                             .then(function (data) {
-                                writeBookFile(oneFile, data);
+                                writeFile(oneFile, data);
                             }).catch(function (err) {
                                 console.log(err);
                             });
@@ -58,9 +58,9 @@ export function generateWebsite(inputStr)
             else {
 				if (path.extname(fileName) == '.txt') {
 
-					readBookFileTxt(inputStr)
+					readFileTxt(inputStr)
                     .then((data) => {
-						writeBookFile(fileName, data);
+						writeFile(fileName, data);
 					})
                     .catch(function (err) {
                         console.log(err);
@@ -69,9 +69,9 @@ export function generateWebsite(inputStr)
                 else if (path.extname(fileName) == '.md') {
                     console.log(".md file found");
 
-                    readBookFileMd(inputStr)
+                    readFileMd(inputStr)
                     .then(function (data){
-                        writeBookFile(fileName, data);
+                        writeFile(fileName, data);
                     })
                     .catch(function (err) {
                         console.log(err);
@@ -100,7 +100,7 @@ function makeDistFolder() {
 }
 
 // Accepts the filepath as a string. Reads and parses the file line by line. Returns an HTML string generated using the file contents.
-function readBookFileTxt(filePath) {
+function readFileTxt(filePath) {
     return new Promise(async (res, rej) => {
         const fileReadStream = readline.createInterface({input: fs.createReadStream(filePath),});
 
@@ -114,7 +114,7 @@ function readBookFileTxt(filePath) {
 }
 
 // Accepts the contents of a file as a string literal. Creates an HTML file containing the content.
-function writeBookFile(fileName, dataArr) {
+function writeFile(fileName, dataArr) {
     return new Promise( (res, rej) => {
         var htmlFilePath = dist_path + "/" + getFileNameNoExt(fileName) + '.html';
         
@@ -168,7 +168,7 @@ function writeBookFile(fileName, dataArr) {
         }
 
 
-        const htmlStr = generateBookHtmlPage(title, htmlBody);
+        const htmlStr = generateHtmlPage(title, htmlBody);
 
         // Write the html file contents ('htmlStr') to the specified file path
         fs.writeFile(htmlFilePath, htmlStr, (err)=>{
@@ -183,7 +183,7 @@ function writeBookFile(fileName, dataArr) {
 }
 
 // Generates the index.html file.
-function generateIndexHtmlFile(books) {
+function generateIndexHtmlFile(filenames) {
     const indexFilePath = dist_path + "/index.html";
     const indexTitle = "AP21 SSG";
 
@@ -198,11 +198,11 @@ function generateIndexHtmlFile(books) {
     </head>
     <body>`;
     
-    // Create an unordered list of hyperlinks for each of the books in the array.
-    for (let i=0; i < books.length; i++) {
+    // Create an unordered list of hyperlinks for each of the filenames in the array.
+    for (let i=0; i < filenames.length; i++) {
         htmlStr += 
         `<li><ul>
-        <a href="${dist_path}/${books[i]}.html">${books[i]}</a>
+        <a href="${dist_path}/${filenames[i]}.html">${filenames[i]}</a>
         </ul></li>`;
     }
     
@@ -218,17 +218,17 @@ function generateIndexHtmlFile(books) {
     });
 }
 
-// Generates the HTML string for a webpage for a single book.
-function generateBookHtmlPage(bookTitle, paragraphs) {
+// Generates the HTML string for a webpage for a single file.
+function generateHtmlPage(title, paragraphs) {
     var str = `<!doctype html>
         <html lang="en">
         <head>
             <meta charset="utf-8">
-            <title>${bookTitle}</title>
+            <title>${title}</title>
             <meta name="viewport" content="width=device-width, initial-scale=1">
         </head>
         <body>
-            <h1>${bookTitle}</h1>
+            <h1>${title}</h1>
             ${paragraphs}
         </body>
         </html>`;
@@ -278,8 +278,8 @@ function parseMarkdown(mdStr) {
     return htmlText;
 }
 
-// Modified version of 'readBookFileTxt()' which calls the 'parseMarkdown' function when pushing to the 'linesArr'.
-function readBookFileMd(filePath) {
+// Modified version of 'readFileTxt()' which calls the 'parseMarkdown' function when pushing to the 'linesArr'.
+function readFileMd(filePath) {
     return new Promise(async (res, rej) => {
         const fileReadStream = readline.createInterface({input: fs.createReadStream(filePath),});
 
