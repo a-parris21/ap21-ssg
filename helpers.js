@@ -270,24 +270,3 @@ function getFileNameNoExt(fileName) {
     Expected HTML Output:       "This <b>is</b> a <b>cat</b>." 
     Actual HTML Output:         "This <b>is** a **cat</b>." 
 */
-function parseMarkdown(mdStr) {
-    const mdBold = /\*\*(.*)\*\*/gim;
-
-    var htmlText = mdStr.replace(mdBold, "<b>$1</b>");
-
-    return htmlText;
-}
-
-// Modified version of 'readBookFileTxt()' which calls the 'parseMarkdown' function when pushing to the 'linesArr'.
-function readBookFileMd(filePath) {
-    return new Promise(async (res, rej) => {
-        const fileReadStream = readline.createInterface({input: fs.createReadStream(filePath),});
-
-        var linesArr = new Array();
-        for await (const line of fileReadStream) {
-            linesArr.push(parseMarkdown(line)); // parse 'line' before pushing it to 'linesArr'
-        }
-
-        res(linesArr);
-    });
-}
