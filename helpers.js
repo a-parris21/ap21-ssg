@@ -4,6 +4,8 @@ import readline from 'readline';
 
 const dist_path = './dist';
 
+var htmlLangAttribute = "en-CA";
+
 export function generateWebsite(inputStr)
 {
     makeDistFolder();
@@ -190,7 +192,7 @@ function generateIndexHtmlFile(filenames) {
     // Generate the head and the beginning of the body elements for the index.html file.
     var htmlStr = 
     `<!doctype html>
-    <html lang="en">
+    <html lang="${htmlLangAttribute}">
     <head>
     <meta charset="utf-8">
     <title>${indexTitle}</title>
@@ -221,7 +223,7 @@ function generateIndexHtmlFile(filenames) {
 // Generates the HTML string for a webpage for a single file.
 function generateHtmlPage(title, paragraphs) {
     var str = `<!doctype html>
-        <html lang="en">
+        <html lang="${htmlLangAttribute}">
         <head>
             <meta charset="utf-8">
             <title>${title}</title>
@@ -259,6 +261,12 @@ function getFileNameNoExt(fileName) {
     str = str.substring(0, last_dot);
 
     return str;
+}
+
+function setHtmlLang(input) {
+    var lang = new String(input);
+
+    htmlLangAttribute = lang;
 }
 
 // Edited Anshul's code for Lab 2 -- where initial markdown support was added. Requires further debugging.

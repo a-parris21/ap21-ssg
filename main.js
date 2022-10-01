@@ -1,6 +1,6 @@
 // #! /usr/bin/env node
 const { version } = require('./package.json');
-import { generateWebsite } from './helpers.js';
+import { generateWebsite, setHtmlLang } from './helpers.js';
 import { Command } from 'commander';
 const program = new Command();
 
@@ -9,7 +9,7 @@ const help_message = generateHelpMessage();
 program.option('-i --input <item>', 'get input')
 	.option('-v --version', 'displays the program name & version number')
 	.option('-h --help', 'displays help message')
-	.option('-l --lang', 'specify the language of the html documents');
+	.option('-l --lang <item>', 'specify the language of the html documents');
 
 program.parse(process.argv);
 
@@ -17,7 +17,7 @@ const options = program.opts();
 
 if (options.version)
 {
-    console.log("v0.1.0");
+    console.log(`${version}`);
 }
 
 if (options.help)
@@ -32,7 +32,7 @@ if (options.input)
 
 if (options.lang)
 {
-    generateWebsite(`${options.input}`); //modify this to accept a 2nd parameter
+    setHtmlLang(`${options.input}`);
 }
 
 function generateHelpMessage()
