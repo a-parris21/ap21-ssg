@@ -20,7 +20,6 @@ export function generateWebsite(inputStr)
 			return;
 		}
         else {
-            console.log("isDir = " + stats.isDirectory() + " | isFile = " + stats.isFile());
             // If a folder was specified, parse each file individually.
 			if (stats.isDirectory()) {
 				fs.readdir(inputStr, (err, files) => {
@@ -42,11 +41,6 @@ export function generateWebsite(inputStr)
                         else if (path.extname(oneFile) == '.md') {
                             console.log(".md file found");
 
-                            /*readBookFileMd(inputStr + '/' + oneFile).then(function (data) {
-                                writeBookFile(oneFile, data);
-                            }, function (err) {
-                                console.log(err);
-                            });*/
                             readBookFileMd(inputStr + '/' + oneFile)
                             .then(function (data) {
                                 writeBookFile(oneFile, data);
@@ -55,7 +49,7 @@ export function generateWebsite(inputStr)
                             });
                         }
                         else {
-                            console.log("neither .txt nor .md file, cannot parse");
+                            console.log("Invalid file type. Cannot parse.");
                         }
 					});
 
@@ -74,7 +68,7 @@ export function generateWebsite(inputStr)
                         console.log(err);
                     });
 				}
-                else if (path.extname(oneFile) == '.md') {
+                else if (path.extname(fileName) == '.md') {
                     console.log(".md file found");
 
                     readBookFileMd(inputStr)
@@ -86,7 +80,7 @@ export function generateWebsite(inputStr)
                     });
                 }
                 else {
-                    console.log("neither .txt nor .md file, cannot parse");
+                    console.log("Invalid file type. Cannot parse.");
                 }
 			}
 		} // end else no errors
@@ -107,124 +101,83 @@ function makeDistFolder() {
 	}
 }
 
-// Accepts the name of a file as a string literal. Reads the file line by line and returns a object containing the file's contents.
+// Accepts the filepath as a string. Reads and parses the file line by line. Returns an HTML string generated using the file contents.
 function readBookFileTxt(filePath) {
     return new Promise(async (res, rej) => {
         const fileReadStream = readline.createInterface({input: fs.createReadStream(filePath),});
 
-        var myBuffer = ""; // Buffer to hold lines read from the file.
-        var title = "";
-        var paragraph = "";
-        var htmlBody = "";
-        var counter = 0; // The number of consecutive empty lines found.
-
-        var arr = new Array();
-
-        let i = 0;
-        for await (const line of fileReadStream)
-        {
-            {/*
-            // If the line is NOT empty then append it to the buffer.
-            if (line.length > 0) {
-                if (myBuffer != "")
-                {
-                    // If 2 or more consecutive empty lines have been found and a title has NOT been set, then set the title.
-                    if ((counter >= 2) && (title == "")) 
-                    {
-                        title = myBuffer;
-                    }
-                    // If 1 empty line was found, then end the current paragraph and append it to 'htmlBody'.
-                    else if (counter == 1)
-                    {
-                        htmlBody += "<p>" + paragraph + "</p>";
-                        paragraph = "";
-                    }
-                    // Otherwise, append the buffer's contents to the current paragraph.
-                    else {
-                        paragraph += myBuffer + "<br/>";
-                    }
-                }
-
-                myBuffer = line;
-                counter = 0;
-            }
-            // Otherwise, if it is empty, then increment 'counter'.
-            else {
-                counter++;
-            }
-            
-            console.log(`${i}: buffer = ${myBuffer}\ntitle = ${title}\nparagraph = ${paragraph}\nbody = ${htmlBody}\n--------------\n\n`);
-            i++;
-            */}
-
-            arr.push(line);
+        var linesArr = new Array();
+        for await (const line of fileReadStream) {
+            linesArr.push(line);
         }
 
-        for (let i=0; i < arr.length; i++) {
-            console.log(`arr[${i}]: ${arr[i]}`);
-        }
-
-        var htmlString = `<!doctype html>
-        <html lang="en">
-        <head>
-            <meta charset="utf-8">
-            <title>${title}</title>
-            <meta name="viewport" content="width=device-width, initial-scale=1">
-        </head>
-        <body>
-            <h1>${title}</h1>
-            ${htmlBody}
-        </body>
-        </html>`;
-        //console.log("**\n" + htmlString + "*******************\n");
-
-        res(htmlString);
+        res(linesArr);
     });
 }
 
 // Accepts the contents of a file as a string literal. Creates an HTML file containing the content.
-function writeBookFile(fileName, data) {
+function writeBookFile(fileName, dataArr) {
     return new Promise( (res, rej) => {
         var htmlFilePath = dist_path + "/" + getFileNameNoExt(fileName) + '.html';
-        var body_str = "";
-        // getting the error here commented out for now and used mine to test mine .md work
-        /*for (let i = 0; i < data.paragraphs.length; i++) {
-            if (i > 0) {
-                body_str += "<br/>";
-            }
-            body_str += data.paragraphs[i];
-        }
-        */
-        for (var line of data) {
-			if (line !== '\n') {
-				body_str += `<p>${line}</p>`;
-			} else {
-				body_str += '\n';
-			}
-		}
-       // content = htmlTemplateStart + title + htmlTemplateMiddle;
-        //content += htmlTemplateEnd;   
+        
+        var myBuffer = ""; // Buffer to hold lines read from the file.
+        var title = "";
+        var titleIndex = -1;
+        var paragraph = "";
+        var htmlBody = "";
+        var emptyLines = 0;
 
-        const htmlStr =
-            `<!doctype html>
-            <html lang="en">
-            <head>
-            <meta charset="utf-8">
-            <title>${data.title}</title>
-            <meta name="viewport" content="width=device-width, initial-scale=1">
-            </head>
-            <body>
-            <h1>${data.title}</h1>
-            ${body_str}
-            </body>
-            </html>`;
+        // Check the text for a title.
+        let x = 0;
+        for (let i=0; i < dataArr.length; i++)
+        {
+            if (dataArr[i].length > 0) {
+                myBuffer = dataArr[i];
+                emptyLines = 0;
+            }
+            else {
+                emptyLines++;
+            }
+
+            if (emptyLines == 2) {
+                title = myBuffer;
+                myBuffer = "";
+                emptyLines = 0;
+                break;
+            }
+        }
+
+        // Note that this loop will end before the last paragraph is added to the html string.
+        for (let i=x+1; i < dataArr.length; i++)
+        {
+            if (dataArr[i].length > 0) {
+                myBuffer += dataArr[i];
+            }
+            else {
+                if (myBuffer.length > 0) {
+                    paragraph = myBuffer;
+                    htmlBody += `<p>${paragraph}</p>\n`;
+                    myBuffer = "";
+                }
+            }
+        }
+
+        // Get the last paragraph.
+        if (myBuffer.length > 0) {
+            paragraph = myBuffer;
+            htmlBody += `<p>${paragraph}</p>\n`;
+            myBuffer = "";
+        }
+
+
+        const htmlStr = generateBookHtmlPage(title, htmlBody);
 
         // Write the html file contents ('htmlStr') to the specified file path
         fs.writeFile(htmlFilePath, htmlStr, (err)=>{
             if (err) {
                 console.log(err);
             }
-            console.log('file created ' + fileName);
+            console.log(`File created: ${htmlFilePath}`);
         });
 
         res(htmlFilePath);
@@ -263,8 +216,26 @@ function generateIndexHtmlFile(books) {
         if (err) {
             console.log(err);
         }
-        console.log("File created");
+        console.log(`File created: ${indexFilePath}`);
     });
+}
+
+// Generates the HTML string for a webpage for a single book.
+function generateBookHtmlPage(bookTitle, paragraphs) {
+    var str = `<!doctype html>
+        <html lang="en">
+        <head>
+            <meta charset="utf-8">
+            <title>${bookTitle}</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+        </head>
+        <body>
+            <h1>${bookTitle}</h1>
+            ${paragraphs}
+        </body>
+        </html>`;
+
+    return str;
 }
 
 // Accepts the name of a file as a string literal. Returns TRUE if it is a .txt file, else returns FALSE.
@@ -287,45 +258,35 @@ function getFileNameNoExt(fileName) {
     var last_dot = str.lastIndexOf('.');
 
     // Make a substring from index 0 up to but excluding the char at 'last_dot'
-    str.substring(0, last_dot);
+    str = str.substring(0, last_dot);
 
     return str;
 }
 
-// lab 2 work here
-// made the changes on the above functions to make it work with the new lab 2 requirements
-// fe bugs in the code, but it works for the most part
-// please review my changes
+/* Accepts a string in MD syntax, parses it and returns an HTML compatible version. 
+    Note: Does not work completely as intended. Will not parse correctly multiple instances of MD bold syntax within the same line.
 
-//new function to deal with .md files
+    Input:                      "This **is** a **cat**."
+    Expected HTML Output:       "This <b>is</b> a <b>cat</b>." 
+    Actual HTML Output:         "This <b>is** a **cat</b>." 
+*/
+function parseMarkdown(mdStr) {
+    const mdBold = /\*\*(.*)\*\*/gim;
 
-function  readBookFileMd(fileName) {
-    return new Promise((res, rej) => {
-        // create a read stream
-        const fileReadStream = fs.createReadStream(fileName, 'utf8');
-        // create an array to store the lines
-        const array = [];
-        // md pattern
-        const mdPattern = /\*\*(.*)\*\*/g;
-        // read the file line by line
-        (async () => {
-        for await (const line of fileReadStream)  {
-            if (line != '') {
-                do {
-                    // match the pattern
-                    var match = mdPattern.exec(line);
-                    if (match) {
-                        // push the match to the array
-                        console.log(match[1]);
-                        array.push(match[1]);
-                    }
-                } while (match);
-            } else {
-                // push the line to the array
-                array.push(line);
-            }
-            }
-        })();
-        res(array);
+    var htmlText = mdStr.replace(mdBold, "<b>$1</b>");
+
+    return htmlText;
+}
+
+function readBookFileMd(filePath) {
+    return new Promise(async (res, rej) => {
+        const fileReadStream = readline.createInterface({input: fs.createReadStream(filePath),});
+
+        var linesArr = new Array();
+        for await (const line of fileReadStream) {
+            linesArr.push(parseMarkdown(line));
+        }
+
+        res(linesArr);
     });
 }
