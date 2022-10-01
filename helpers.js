@@ -261,6 +261,8 @@ function getFileNameNoExt(fileName) {
     return str;
 }
 
+// Edited Anshul's code for Lab 2 -- where initial markdown support was added. Requires further debugging.
+
 /* Accepts a string in MD syntax, parses it and returns an HTML compatible version. 
     Note: Does not work completely as intended. Will not parse correctly multiple instances of MD bold syntax within the same line.
 
@@ -276,13 +278,14 @@ function parseMarkdown(mdStr) {
     return htmlText;
 }
 
+// Modified version of 'readBookFileTxt()' which calls the 'parseMarkdown' function when pushing to the 'linesArr'.
 function readBookFileMd(filePath) {
     return new Promise(async (res, rej) => {
         const fileReadStream = readline.createInterface({input: fs.createReadStream(filePath),});
 
         var linesArr = new Array();
         for await (const line of fileReadStream) {
-            linesArr.push(parseMarkdown(line));
+            linesArr.push(parseMarkdown(line)); // parse 'line' before pushing it to 'linesArr'
         }
 
         res(linesArr);
