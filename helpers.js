@@ -281,9 +281,13 @@ function getFileNameNoExt(fileName) {
     Actual HTML Output:         "This <b>is** a **cat</b>." 
 */
 function parseMarkdown(mdStr) {
-    const mdBold = /\*\*(.*)\*\*/gim;
+    const mdBold = /\*\*(.*)\*\*/gim;       // reg expression for bold syntax
+    const mdInlineCode = /\`(.*)\`/gim;     // reg exp for in-line code syntax
+    const mdHr = /^(\s*)\-\-\-(\s*$)/;      // reg exp for horizontal rule
 
-    var htmlText = mdStr.replace(mdBold, "<b>$1</b>");
+    var htmlText = mdStr.replace(mdBold, "<b>$1</b>")
+    .replace(mdInlineCode, "<code>$1</code>")
+    .replace(mdHr, "<hr><br/>");
 
     return htmlText;
 }
