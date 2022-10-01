@@ -4,8 +4,6 @@ import readline from 'readline';
 
 const dist_path = './dist';
 
-var bookNames = new Array();
-
 export function generateWebsite(inputStr)
 {
     makeDistFolder();
