@@ -33,19 +33,6 @@ export function generateWebsite(inputStr)
 								writeBookFile(oneFile, data);
 							})
                             .catch(function (err) {
-<<<<<<< HEAD
-=======
-                                console.log(err);
-                            });
-						}
-                        else if (path.extname(oneFile) == '.md') {
-                            console.log(".md file found");
-
-                            readBookFileMd(inputStr + '/' + oneFile)
-                            .then(function (data) {
-                                writeBookFile(oneFile, data);
-                            }).catch(function (err) {
->>>>>>> fa1878d15c0a7a73ad52693eae82c0c9eda2945f
                                 console.log(err);
                             });
 						}
@@ -58,9 +45,6 @@ export function generateWebsite(inputStr)
                             }).catch(function (err) {
                                 console.log(err);
                             });
-                        }
-                        else {
-                            console.log("Invalid file type. Cannot parse.");
                         }
                         else {
                             console.log("Invalid file type. Cannot parse.");
@@ -277,12 +261,6 @@ function getFileNameNoExt(fileName) {
     return str;
 }
 
-<<<<<<< HEAD
-
-//-------------------------------------
-
-=======
->>>>>>> fa1878d15c0a7a73ad52693eae82c0c9eda2945f
 // Edited Anshul's code for Lab 2 -- where initial markdown support was added. Requires further debugging.
 
 /* Accepts a string in MD syntax, parses it and returns an HTML compatible version. 
