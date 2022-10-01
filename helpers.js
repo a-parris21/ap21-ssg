@@ -87,6 +87,14 @@ export function generateWebsite(inputStr)
 	});
 }
 
+
+export function setHtmlLang(input) {
+    if (input.length > 0) {
+        var lang = new String(input);
+        htmlLangAttribute = lang;
+    }
+}
+
 function makeDistFolder() {
     // If the /dist directory exists, remove the folder and all of its contents
     if (fs.existsSync(dist_path)) {
@@ -261,12 +269,6 @@ function getFileNameNoExt(fileName) {
     str = str.substring(0, last_dot);
 
     return str;
-}
-
-function setHtmlLang(input) {
-    var lang = new String(input);
-
-    htmlLangAttribute = lang;
 }
 
 // Edited Anshul's code for Lab 2 -- where initial markdown support was added. Requires further debugging.
