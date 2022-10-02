@@ -13,7 +13,34 @@ export function generateWebsite(inputStr)
     // Get the filename from the full pathname.
     const fileName = path.basename(inputStr);
 
-    // Check whether the filepath is a single file or a folder.
+    parseFile(inputStr, fileName);
+
+    return 0;
+}
+
+export function setHtmlLang(input) {
+    if (input.length > 0) {
+        var lang = new String(input);
+        htmlLangAttribute = lang;
+    }
+}
+
+function makeOutputFolder() {
+    // If the /dist directory exists, remove the folder and all of its contents
+    if (fs.existsSync(dist_path)) {
+		fs.rmSync(dist_path, { recursive: true, force: true });
+	}
+
+    // Create a new /dist directory, if it does not already exist.
+    /* Note: This IF statement may be redundant, since the /dist folder should be deleted 
+       by the above code block before execution reaches this line. */
+    if (!fs.existsSync(dist_path)) {
+		fs.mkdirSync(dist_path);
+	}
+}
+
+function parseFile(inputStr, fileName) {
+     // Check whether the filepath is a single file or a folder.
 	fs.lstat(inputStr, (err, stats) => {
 		if (err) {
 			console.log(err);
@@ -89,29 +116,6 @@ export function generateWebsite(inputStr)
 			}
 		} // end else no errors
 	});
-
-    return 0;
-}
-
-export function setHtmlLang(input) {
-    if (input.length > 0) {
-        var lang = new String(input);
-        htmlLangAttribute = lang;
-    }
-}
-
-function makeOutputFolder() {
-    // If the /dist directory exists, remove the folder and all of its contents
-    if (fs.existsSync(dist_path)) {
-		fs.rmSync(dist_path, { recursive: true, force: true });
-	}
-
-    // Create a new /dist directory, if it does not already exist.
-    /* Note: This IF statement may be redundant, since the /dist folder should be deleted 
-       by the above code block before execution reaches this line. */
-    if (!fs.existsSync(dist_path)) {
-		fs.mkdirSync(dist_path);
-	}
 }
 
 // Accepts the filepath as a string. Reads and parses the file line by line. Returns an HTML string generated using the file contents.
