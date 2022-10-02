@@ -19,7 +19,7 @@ const options = program.opts();
 
 if (options.version)
 {
-    console.log(`${ver}`);
+    console.log(`${version}`);
 }
 
 if (options.help)
