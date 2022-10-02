@@ -2,13 +2,50 @@ import fs, { stat } from 'fs';
 import path from 'path';
 import readline from 'readline';
 
-const dist_path = './dist';
-var output_path = dist_path;
+const dist_path = "./dist";
+var output_path = "";
 var htmlLangAttribute = "en-CA";
+
+export function setHtmlLang(lang) {
+    if (lang.length > 0)
+    {
+        var lang_ = new String(lang);
+        htmlLangAttribute = lang_;
+    }
+}
+
+function setOutputFolder(outputDir) {
+    var output_ = "./";
+    
+    if (outputDir.length > 0)
+    {
+        var temp = new String(outputDir);
+        var pathStartWithDot = new RegExp('^\.\/.*');
+        var pathStartNoDot = new RegExp('^\/.*');
+
+        if (pathStartWithDot.test(temp)) {
+            output_ += temp.substring(2);
+        }
+        else if (pathStartNoDot.test(temp)) {
+            output_ += temp.substring(1);
+        }
+        else {
+            output_ = temp;
+        }
+    }
+    else
+    {
+        output_ = new String(dist_path);
+    }
+
+    output_path = output_;
+
+    makeOutputFolder(output_.valueOf());
+}
 
 export function generateWebsite(inputStr)
 {
-    makeOutputFolder();
+    setOutputFolder("");
 
     // Get the filename from the full pathname.
     const fileName = path.basename(inputStr);
@@ -40,8 +77,6 @@ export function generateWebsite(inputStr)
                             });
 						}
                         else if (path.extname(oneFile) == '.md') {
-                            console.log(".md file found");
-
                             readFileMd(inputStr + '/' + oneFile)
                             .then(function (data) {
                                 writeFile(oneFile, data);
@@ -93,27 +128,100 @@ export function generateWebsite(inputStr)
     return 0;
 }
 
-export function setHtmlLang(lang) {
-    if (lang.length > 0) {
-        var lang_ = new String(lang);
-        htmlLangAttribute = lang_;
-    }
+export function generateWebsiteWithOutput(inputStr, outputStr)
+{
+    setOutputFolder(outputStr);
+
+    // Get the filename from the full pathname.
+    const fileName = path.basename(inputStr);
+
+    // Check whether the filepath is a single file or a folder.
+	fs.lstat(inputStr, (err, stats) => {
+		if (err) {
+			console.log(err);
+			return -1;
+		}
+        else {
+            // If a folder was specified, parse each file individually.
+			if (stats.isDirectory()) {
+				fs.readdir(inputStr, (err, files) => {
+
+					files.forEach((oneFile) => {
+						if (err) {
+							console.log(err);
+							return -1;
+						}
+						else if (path.extname(oneFile) == '.txt') {
+							readFileTxt(inputStr + '/' + oneFile)
+                            .then(function (data) {
+								writeFile(oneFile, data);
+							})
+                            .catch(function (err) {
+                                console.log(err);
+                                return -1;
+                            });
+						}
+                        else if (path.extname(oneFile) == '.md') {
+                            readFileMd(inputStr + '/' + oneFile)
+                            .then(function (data) {
+                                writeFile(oneFile, data);
+                            }).catch(function (err) {
+                                console.log(err);
+                                return -1;
+                            });
+                        }
+                        else {
+                            console.log("Invalid file type. Cannot parse.");
+                        }
+					});
+
+					generateIndexHtmlFile(files, true);
+				});
+			}
+            // Otherwise, if the filepath was a single file then parse it.
+            else {
+				if (path.extname(fileName) == '.txt') {
+
+					readFileTxt(inputStr)
+                    .then((data) => {
+						writeFile(fileName, data);
+					})
+                    .catch(function (err) {
+                        console.log(err);
+                        return -1;
+                    });
+				}
+                else if (path.extname(fileName) == '.md') {
+                    readFileMd(inputStr)
+                    .then(function (data){
+                        writeFile(fileName, data);
+                    })
+                    .catch(function (err) {
+                        console.log(err);
+                        return -1;
+                    });
+                }
+                else {
+                    console.log("Invalid file type. Cannot parse.");
+                }
+			}
+		} // end else no errors
+	});
+
+    return 0;
 }
 
-export function setOutputFolder(output_path) {
-}
-
-function makeOutputFolder() {
+function makeOutputFolder(filepath) {
     // If the /dist directory exists, remove the folder and all of its contents
-    if (fs.existsSync(dist_path)) {
-		fs.rmSync(dist_path, { recursive: true, force: true });
+    if (fs.existsSync(filepath)) {
+		fs.rmSync(filepath, { recursive: true, force: true });
 	}
 
     // Create a new /dist directory, if it does not already exist.
     /* Note: This IF statement may be redundant, since the /dist folder should be deleted 
        by the above code block before execution reaches this line. */
-    if (!fs.existsSync(dist_path)) {
-		fs.mkdirSync(dist_path);
+    if (!fs.existsSync(filepath)) {
+		fs.mkdirSync(filepath);
 	}
 }
 
@@ -134,7 +242,7 @@ function readFileTxt(filePath) {
 // Accepts the contents of a file as a string literal. Creates an HTML file containing the content.
 function writeFile(fileName, dataArr) {
     return new Promise( (res, rej) => {
-        var htmlFilePath = dist_path + "/" + getFileNameNoExt(fileName) + '.html';
+        var htmlFilePath = output_path + "/" + getFileNameNoExt(fileName) + '.html';
         
         var myBuffer = ""; // Buffer to hold lines read from the file.
         var title = "";
@@ -203,7 +311,7 @@ function writeFile(fileName, dataArr) {
 
 // Generates the index.html file.
 function generateIndexHtmlFile(filenames) {
-    const indexFilePath = dist_path + "/index.html";
+    const indexFilePath = output_path + "/index.html";
     const indexTitle = "AP21 SSG";
 
     // Generate the head and the beginning of the body elements for the index.html file.
@@ -221,7 +329,7 @@ function generateIndexHtmlFile(filenames) {
     for (let i=0; i < filenames.length; i++) {
         htmlStr += 
         `<li><ul>
-        <a href="${dist_path}/${filenames[i]}.html">${filenames[i]}</a>
+        <a href="${output_path}/${filenames[i]}.html">${filenames[i]}</a>
         </ul></li>`;
     }
     
@@ -293,7 +401,7 @@ function getFileNameNoExt(fileName) {
 function parseMarkdown(mdStr) {
     const mdBold = /\*\*(.*)\*\*/gim;       // reg expression for bold syntax
     const mdInlineCode = /\`(.*)\`/gim;     // reg exp for in-line code syntax
-    const mdHr = /^(\s*)\-\-\-(\s*$)/;      // reg exp for horizontal rule
+    const mdHr = /^(\s*)\-\-\-(\s*$)/gm;      // reg exp for horizontal rule
 
     var htmlText = mdStr.replace(mdBold, "<b>$1</b>")
     .replace(mdInlineCode, "<code>$1</code>")
