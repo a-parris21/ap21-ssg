@@ -56,6 +56,17 @@ export function generateWebsite(inputStr)
     return 0;
 }
 
+export function generateWebsiteWithOutput(inputStr, outputStr) {
+    setOutputFolder(outputStr);
+
+    parseFile(inputStr);
+    if (allFileNames > 1) {
+        generateIndexHtmlFile(allFileNames);
+    }
+
+    return 0;
+}
+
 export function setHtmlLang(input) {
     if (input.length > 0) {
         var lang = new String(input);
