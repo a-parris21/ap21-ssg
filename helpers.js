@@ -47,6 +47,7 @@ function setOutputFolder(outputDir) {
 export function generateWebsite(inputStr, outputStr)
 {
     setOutputFolder(outputStr);
+    console.log(`in:${inputStr}|out:${outputStr}`);
 
     parseFile(inputStr);
     if (allFileNames > 1) {
@@ -56,23 +57,27 @@ export function generateWebsite(inputStr, outputStr)
     return 0;
 }
 
-function makeOutputFolder() {
+function makeOutputFolder(outputDir) {
     // If the /dist directory exists, remove the folder and all of its contents
-    if (fs.existsSync(dist_path)) {
-		fs.rmSync(dist_path, { recursive: true, force: true });
+    if (fs.existsSync(outputDir)) {
+		fs.rmSync(outputDir, { recursive: true, force: true });
 	}
 
     // Create a new /dist directory, if it does not already exist.
     /* Note: This IF statement may be redundant, since the /dist folder should be deleted 
        by the above code block before execution reaches this line. */
-    if (!fs.existsSync(dist_path)) {
-		fs.mkdirSync(dist_path);
+    if (!fs.existsSync(outputDir)) {
+		fs.mkdirSync(outputDir);
 	}
 }
 
 function parseFile(inputStr) {
     // Get the filename from the full pathname.
     const fileName = path.basename(inputStr);
+
+    console.log("parsing: " + inputStr);
+    console.log("did it break yet?");
+    console.log("========");
 
     // Check whether the filepath is a single file or a folder.
 	fs.lstat(inputStr, (err, stats) => {
@@ -103,7 +108,7 @@ function parseFile(inputStr) {
 				if (path.extname(fileName) == '.txt') {
 					readFileTxt(inputStr)
                     .then((data) => {
-						writeFile(fileName, data);
+						writeHtmlFile(fileName, data);
 					})
                     .catch(function (err) {
                         console.log(err);
@@ -113,7 +118,7 @@ function parseFile(inputStr) {
                 else if (path.extname(fileName) == '.md') {
                     readFileMd(inputStr)
                     .then(function (data){
-                        writeFile(fileName, data);
+                        writeHtmlFile(fileName, data);
                     })
                     .catch(function (err) {
                         console.log(err);
@@ -143,7 +148,7 @@ function readFileTxt(filePath) {
 }
 
 // Accepts the contents of a file as a string literal. Creates an HTML file containing the content.
-function writeFile(fileName, dataArr) {
+function writeHtmlFile(fileName, dataArr) {
     return new Promise( (res, rej) => {
         var htmlFilePath = output_path + "/" + getFileNameNoExt(fileName) + '.html';
         
