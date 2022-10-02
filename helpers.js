@@ -72,10 +72,6 @@ function parseFile(inputStr, outputStr) {
     // Get the filename from the full pathname.
     const fileName = path.basename(inputStr);
 
-    console.log("parsing: " + inputStr);
-    console.log("did it break yet?");
-    console.log("========");
-
     // Check whether the filepath is a single file or a folder.
 	fs.lstat(inputStr, (err, stats) => {
 		if (err) {
