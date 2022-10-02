@@ -164,7 +164,7 @@ function writeFile(fileName, dataArr) {
         for (let i=x+1; i < dataArr.length; i++)
         {
             if (dataArr[i].length > 0) {
-                myBuffer += dataArr[i];
+                myBuffer += dataArr[i] + "<br>";
             }
             else {
                 if (myBuffer.length > 0) {

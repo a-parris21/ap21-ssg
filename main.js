@@ -34,7 +34,7 @@ if (options.input)
 
 if (options.lang)
 {
-    setHtmlLang(`${options.input}`);
+    setHtmlLang(`${options.lang}`);
 }
 
 function generateHelpMessage()
