@@ -3,12 +3,12 @@ import path from 'path';
 import readline from 'readline';
 
 const dist_path = './dist';
-
+var output_path = dist_path;
 var htmlLangAttribute = "en-CA";
 
 export function generateWebsite(inputStr)
 {
-    makeDistFolder();
+    makeOutputFolder();
 
     // Get the filename from the full pathname.
     const fileName = path.basename(inputStr);
@@ -87,7 +87,6 @@ export function generateWebsite(inputStr)
 	});
 }
 
-
 export function setHtmlLang(input) {
     if (input.length > 0) {
         var lang = new String(input);
@@ -95,7 +94,7 @@ export function setHtmlLang(input) {
     }
 }
 
-function makeDistFolder() {
+function makeOutputFolder() {
     // If the /dist directory exists, remove the folder and all of its contents
     if (fs.existsSync(dist_path)) {
 		fs.rmSync(dist_path, { recursive: true, force: true });
