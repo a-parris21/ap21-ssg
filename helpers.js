@@ -3,20 +3,19 @@ import path from 'path';
 import readline from 'readline';
 
 const dist_path = "./dist";
-var output_path = "";
 var htmlLangAttribute = "en-CA";
 var allFileNames = new Array(String);
 
 export function setHtmlLang(lang) {
     if (lang.length > 0)
     {
-        var lang_ = new String(lang);
-        htmlLangAttribute = lang_;
+        var language = new String(lang);
+        htmlLangAttribute = language;
     }
 }
 
 function setOutputFolder(outputDir) {
-    var output_ = "./";
+    var outputPath = "./";
     
     if (outputDir.length > 0)
     {
@@ -25,23 +24,21 @@ function setOutputFolder(outputDir) {
         var pathStartNoDot = new RegExp('^\/.*');
 
         if (pathStartWithDot.test(temp)) {
-            output_ += temp.substring(2);
+            outputPath += temp.substring(2);
         }
         else if (pathStartNoDot.test(temp)) {
-            output_ += temp.substring(1);
+            outputPath += temp.substring(1);
         }
         else {
-            output_ = temp;
+            outputPath = temp;
         }
     }
     else
     {
-        output_ = new String(dist_path);
+        outputPath = new String(dist_path);
     }
 
-    output_path = output_;
-
-    makeOutputFolder(output_.valueOf());
+    makeOutputFolder(outputPath.valueOf());
 }
 
 export function generateWebsite(inputStr, outputStr)
@@ -49,9 +46,9 @@ export function generateWebsite(inputStr, outputStr)
     setOutputFolder(outputStr);
     console.log(`in:${inputStr}|out:${outputStr}`);
 
-    parseFile(inputStr);
+    parseFile(inputStr, outputStr);
     if (allFileNames > 1) {
-        generateIndexHtmlFile(allFileNames);
+        generateIndexHtmlFile(allFileNames, outputStr);
     }
 
     return 0;
@@ -71,7 +68,7 @@ function makeOutputFolder(outputDir) {
 	}
 }
 
-function parseFile(inputStr) {
+function parseFile(inputStr, outputStr) {
     // Get the filename from the full pathname.
     const fileName = path.basename(inputStr);
 
@@ -95,7 +92,7 @@ function parseFile(inputStr) {
                         files.forEach((oneFile) => {
                             oneFile = inputStr + '/' + oneFile;
                             //console.log(`Currently parsing ${oneFile}.`);
-                            parseFile(oneFile);
+                            parseFile(oneFile, outputStr);
                         });
                     }
                     else {
@@ -108,7 +105,7 @@ function parseFile(inputStr) {
 				if (path.extname(fileName) == '.txt') {
 					readFileTxt(inputStr)
                     .then((data) => {
-						writeHtmlFile(fileName, data);
+						writeHtmlFile(fileName, outputStr, data);
 					})
                     .catch(function (err) {
                         console.log(err);
@@ -118,7 +115,7 @@ function parseFile(inputStr) {
                 else if (path.extname(fileName) == '.md') {
                     readFileMd(inputStr)
                     .then(function (data){
-                        writeHtmlFile(fileName, data);
+                        writeHtmlFile(fileName, outputStr, data);
                     })
                     .catch(function (err) {
                         console.log(err);
@@ -148,9 +145,9 @@ function readFileTxt(filePath) {
 }
 
 // Accepts the contents of a file as a string literal. Creates an HTML file containing the content.
-function writeHtmlFile(fileName, dataArr) {
+function writeHtmlFile(fileName, outputDir, dataArr) {
     return new Promise( (res, rej) => {
-        var htmlFilePath = output_path + "/" + getFileNameNoExt(fileName) + '.html';
+        var htmlFilePath = outputDir + "/" + getFileNameNoExt(fileName) + '.html';
         
         var myBuffer = ""; // Buffer to hold lines read from the file.
         var title = "";
@@ -218,8 +215,8 @@ function writeHtmlFile(fileName, dataArr) {
 }
 
 // Generates the index.html file.
-function generateIndexHtmlFile(filenames) {
-    const indexFilePath = output_path + "/index.html";
+function generateIndexHtmlFile(filenames, outputDir) {
+    const indexFilePath = outputDir + "/index.html";
     const indexTitle = "AP21 SSG";
 
     // Generate the head and the beginning of the body elements for the index.html file.
@@ -237,7 +234,7 @@ function generateIndexHtmlFile(filenames) {
     for (let i=0; i < filenames.length; i++) {
         htmlStr += 
         `<li><ul>
-        <a href="${output_path}/${filenames[i]}.html">${filenames[i]}</a>
+        <a href="${outputDir}/${filenames[i]}.html">${filenames[i]}</a>
         </ul></li>`;
     }
     
@@ -289,10 +286,10 @@ function getFileNameNoExt(fileName) {
     str = fileName;
     
     // Get the index of the last '.' char in the filename
-    var last_dot = str.lastIndexOf('.');
+    var lastDot = str.lastIndexOf('.');
 
-    // Make a substring from index 0 up to but excluding the char at 'last_dot'
-    str = str.substring(0, last_dot);
+    // Make a substring from index 0 up to but excluding the char at 'lastDot'
+    str = str.substring(0, lastDot);
 
     return str;
 }
