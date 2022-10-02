@@ -5,15 +5,16 @@ import readline from 'readline';
 const dist_path = './dist';
 var output_path = dist_path;
 var htmlLangAttribute = "en-CA";
+var allFileNames = new Array(String);
 
 export function generateWebsite(inputStr)
 {
     makeOutputFolder();
 
-    // Get the filename from the full pathname.
-    const fileName = path.basename(inputStr);
-
-    parseFile(inputStr, fileName);
+    parseFile(inputStr);
+    if (allFileNames > 1) {
+        generateIndexHtmlFile(allFileNames);
+    }
 
     return 0;
 }
@@ -39,8 +40,11 @@ function makeOutputFolder() {
 	}
 }
 
-function parseFile(inputStr, fileName) {
-     // Check whether the filepath is a single file or a folder.
+function parseFile(inputStr) {
+    // Get the filename from the full pathname.
+    const fileName = path.basename(inputStr);
+
+    // Check whether the filepath is a single file or a folder.
 	fs.lstat(inputStr, (err, stats) => {
 		if (err) {
 			console.log(err);
@@ -51,44 +55,22 @@ function parseFile(inputStr, fileName) {
 			if (stats.isDirectory()) {
 				fs.readdir(inputStr, (err, files) => {
 
-					files.forEach((oneFile) => {
-						if (err) {
-							console.log(err);
-							return -1;
-						}
-						else if (path.extname(oneFile) == '.txt') {
-							readFileTxt(inputStr + '/' + oneFile)
-                            .then(function (data) {
-								writeFile(oneFile, data);
-							})
-                            .catch(function (err) {
-                                console.log(err);
-                                return -1;
-                            });
-						}
-                        else if (path.extname(oneFile) == '.md') {
-                            console.log(".md file found");
-
-                            readFileMd(inputStr + '/' + oneFile)
-                            .then(function (data) {
-                                writeFile(oneFile, data);
-                            }).catch(function (err) {
-                                console.log(err);
-                                return -1;
-                            });
-                        }
-                        else {
-                            console.log("Invalid file type. Cannot parse.");
-                        }
-					});
-
-					generateIndexHtmlFile(files, true);
+                    if (files.length > 0)
+                    {
+                        files.forEach((oneFile) => {
+                            oneFile = inputStr + '/' + oneFile;
+                            console.log(`Currently parsing ${oneFile}.`);
+                            parseFile(oneFile);
+                        });
+                    }
+                    else {
+                        console.log(`${inputStr} is an empty directory. No files to parse.`);
+                    }
 				});
 			}
             // Otherwise, if the filepath was a single file then parse it.
             else {
 				if (path.extname(fileName) == '.txt') {
-
 					readFileTxt(inputStr)
                     .then((data) => {
 						writeFile(fileName, data);
@@ -99,8 +81,6 @@ function parseFile(inputStr, fileName) {
                     });
 				}
                 else if (path.extname(fileName) == '.md') {
-                    console.log(".md file found");
-
                     readFileMd(inputStr)
                     .then(function (data){
                         writeFile(fileName, data);
