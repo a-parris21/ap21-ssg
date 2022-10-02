@@ -1,6 +1,6 @@
 // #! /usr/bin/env node
 
-import { generateWebsite, setHtmlLang } from './helpers.js';
+import { generateWebsite, setHtmlLang, setOutputFolder } from './helpers.js';
 import { Command } from 'commander';
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
@@ -11,7 +11,8 @@ const help_message = generateHelpMessage();
 program.option('-i --input <item>', 'get input')
 	.option('-v --version', 'displays the program name & version number')
 	.option('-h --help', 'displays help message')
-	.option('-l --lang <item>', 'specify the language of the html documents');
+	.option('-l --lang <item>', 'specify the language of the html documents')
+	.option('-o --output <item>', 'specify the output folder where the html files will be generated');
 
 program.parse(process.argv);
 
@@ -35,6 +36,11 @@ if (options.input)
 if (options.lang)
 {
     setHtmlLang(`${options.lang}`);
+}
+
+if (options.output)
+{
+    setOutputFolder(`${options.output}`);
 }
 
 function generateHelpMessage()
