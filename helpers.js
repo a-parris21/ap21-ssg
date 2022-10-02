@@ -93,10 +93,10 @@ export function generateWebsite(inputStr)
     return 0;
 }
 
-export function setHtmlLang(input) {
-    if (input.length > 0) {
-        var lang = new String(input);
-        htmlLangAttribute = lang;
+export function setHtmlLang(lang) {
+    if (lang.length > 0) {
+        var lang_ = new String(lang);
+        htmlLangAttribute = lang_;
     }
 }
 
