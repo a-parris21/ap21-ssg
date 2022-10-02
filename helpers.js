@@ -44,19 +44,8 @@ function setOutputFolder(outputDir) {
     makeOutputFolder(output_.valueOf());
 }
 
-export function generateWebsite(inputStr)
+export function generateWebsite(inputStr, outputStr)
 {
-    setOutputFolder("");
-
-    parseFile(inputStr);
-    if (allFileNames > 1) {
-        generateIndexHtmlFile(allFileNames);
-    }
-
-    return 0;
-}
-
-export function generateWebsiteWithOutput(inputStr, outputStr) {
     setOutputFolder(outputStr);
 
     parseFile(inputStr);
@@ -65,13 +54,6 @@ export function generateWebsiteWithOutput(inputStr, outputStr) {
     }
 
     return 0;
-}
-
-export function setHtmlLang(input) {
-    if (input.length > 0) {
-        var lang = new String(input);
-        htmlLangAttribute = lang;
-    }
 }
 
 function makeOutputFolder() {

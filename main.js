@@ -1,6 +1,6 @@
 // #! /usr/bin/env node
 
-import { generateWebsite, setHtmlLang, generateWebsiteWithOutput } from './helpers.js';
+import { generateWebsite, setHtmlLang } from './helpers.js';
 import { Command } from 'commander';
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
@@ -31,10 +31,10 @@ if (options.help)
 if (options.input)
 {
     if (options.output) {
-        generateWebsiteWithOutput(`${options.input}`, `${options.output}`);
+        generateWebsite(`${options.input}`, `${options.output}`);
     }
     else {
-        generateWebsite(`${options.input}`);
+        generateWebsite(`${options.input}`, '');
     }
 }
 
