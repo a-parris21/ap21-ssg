@@ -17,7 +17,7 @@ export function generateWebsite(inputStr)
 	fs.lstat(inputStr, (err, stats) => {
 		if (err) {
 			console.log(err);
-			return;
+			return -1;
 		}
         else {
             // If a folder was specified, parse each file individually.
@@ -27,7 +27,7 @@ export function generateWebsite(inputStr)
 					files.forEach((oneFile) => {
 						if (err) {
 							console.log(err);
-							return;
+							return -1;
 						}
 						else if (path.extname(oneFile) == '.txt') {
 							readFileTxt(inputStr + '/' + oneFile)
@@ -36,6 +36,7 @@ export function generateWebsite(inputStr)
 							})
                             .catch(function (err) {
                                 console.log(err);
+                                return -1;
                             });
 						}
                         else if (path.extname(oneFile) == '.md') {
@@ -46,6 +47,7 @@ export function generateWebsite(inputStr)
                                 writeFile(oneFile, data);
                             }).catch(function (err) {
                                 console.log(err);
+                                return -1;
                             });
                         }
                         else {
@@ -66,6 +68,7 @@ export function generateWebsite(inputStr)
 					})
                     .catch(function (err) {
                         console.log(err);
+                        return -1;
                     });
 				}
                 else if (path.extname(fileName) == '.md') {
@@ -77,6 +80,7 @@ export function generateWebsite(inputStr)
                     })
                     .catch(function (err) {
                         console.log(err);
+                        return -1;
                     });
                 }
                 else {
@@ -183,6 +187,7 @@ function writeFile(fileName, dataArr) {
         fs.writeFile(htmlFilePath, htmlStr, (err)=>{
             if (err) {
                 console.log(err);
+                return -1;
             }
             console.log(`File created: ${htmlFilePath}`);
         });
@@ -222,6 +227,7 @@ function generateIndexHtmlFile(filenames) {
     fs.writeFile(indexFilePath, htmlStr, (err) => {
         if (err) {
             console.log(err);
+            return -1;
         }
         console.log(`File created: ${indexFilePath}`);
     });
