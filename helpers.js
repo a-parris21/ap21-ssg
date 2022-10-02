@@ -89,6 +89,8 @@ export function generateWebsite(inputStr)
 			}
 		} // end else no errors
 	});
+
+    return 0;
 }
 
 export function setHtmlLang(input) {
