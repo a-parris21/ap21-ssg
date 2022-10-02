@@ -100,6 +100,9 @@ export function setHtmlLang(input) {
     }
 }
 
+export function setOutputFolder(output_path) {
+}
+
 function makeOutputFolder() {
     // If the /dist directory exists, remove the folder and all of its contents
     if (fs.existsSync(dist_path)) {
