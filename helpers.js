@@ -59,7 +59,7 @@ function parseFile(inputStr) {
                     {
                         files.forEach((oneFile) => {
                             oneFile = inputStr + '/' + oneFile;
-                            console.log(`Currently parsing ${oneFile}.`);
+                            //console.log(`Currently parsing ${oneFile}.`);
                             parseFile(oneFile);
                         });
                     }
