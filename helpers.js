@@ -1,6 +1,7 @@
 import fs, { stat } from 'fs';
 import path from 'path';
 import readline from 'readline';
+import configStyle from './main.js';
 
 const dist_path = "./dist";
 var htmlLangAttribute = "en-CA";
@@ -41,7 +42,7 @@ function setOutputFolder(outputDir) {
     makeOutputFolder(outputPath.valueOf());
 }
 
-export function generateWebsite(inputStr, outputStr)
+export function generateWebsite(inputStr, outputStr, configStyle= '')
 {
     setOutputFolder(outputStr);
     parseFile(inputStr, outputStr);
@@ -208,8 +209,11 @@ function writeHtmlFile(fileName, outputDir, dataArr) {
             myBuffer = "";
         }
 
+       
 
-        const htmlStr = generateHtmlPage(title, htmlBody);
+        
+
+        const htmlStr = generateHtmlPage(title, htmlBody, configStyle);
 
         // Write the html file contents ('htmlStr') to the specified file path
         fs.writeFile(htmlFilePath, htmlStr, (err)=>{
@@ -225,7 +229,7 @@ function writeHtmlFile(fileName, outputDir, dataArr) {
 }
 
 // Generates the index.html file.
-function generateIndexHtmlFile(filenames, outputDir) {
+function generateIndexHtmlFile(filenames, outputDir, configStyle) {
     const indexFilePath = outputDir + "/index.html";
     const indexTitle = "AP21 SSG";
 
@@ -262,20 +266,42 @@ function generateIndexHtmlFile(filenames, outputDir) {
 }
 
 // Generates the HTML string for a webpage for a single file.
-function generateHtmlPage(title, paragraphs) {
-    var str = `<!doctype html>
+function generateHtmlPage(title, paragraphs, configStyle) {
+    if(configStyle) 
+    {
+
+        var str = `<!doctype html>
         <html lang="${htmlLangAttribute}">
         <head>
-            <meta charset="utf-8">
-            <title>${title}</title>
-            <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta charset="utf-8">
+        <title>${title}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="${configStyle}"/>
         </head>
         <body>
-            <h1>${title}</h1>
-            ${paragraphs}
+        <h1>${title}</h1>
+        ${paragraphs}
         </body>
         </html>`;
+        
+    }
 
+    else 
+    {
+        var str = `<!doctype html>
+        <html lang="${htmlLangAttribute}">
+        <head>
+        <meta charset="utf-8">
+        <title>${title}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        </head>
+        <body>
+        <h1>${title}</h1>
+        ${paragraphs}
+        </body>
+        </html>`;
+        
+    }
     return str;
 }
 
