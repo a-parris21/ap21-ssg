@@ -35,30 +35,30 @@ if(options.config)
 if(!options.config) 
 {
 
-if (options.version)
-{
-    console.log(`${version}`);
-}
-
-if (options.help)
-{
-    console.log(help_message);
-}
-
-if (options.input)
-{
-    if (options.output) {
-        generateWebsite(`${options.input} `, `${options.output}`);
+    if (options.version)
+    {
+        console.log(`${version}`);
     }
-    else {
-        generateWebsite(`${options.input}`, '');
-    }
-}
 
-if (options.lang)
-{
-    setHtmlLang(`${options.lang}`);
-}
+    if (options.help)
+    {
+        console.log(help_message);
+    }
+
+    if (options.input)
+    {
+        if (options.output) {
+            generateWebsite(`${options.input} `, `${options.output}`);
+        }
+        else {
+            generateWebsite(`${options.input}`, '');
+        }
+    }
+
+    if (options.lang)
+    {
+        setHtmlLang(`${options.lang}`);
+    }
 
 }
 
