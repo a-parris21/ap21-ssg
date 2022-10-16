@@ -44,8 +44,6 @@ function setOutputFolder(outputDir) {
 export function generateWebsite(inputStr, outputStr)
 {
     setOutputFolder(outputStr);
-    console.log(`in:${inputStr}|out:${outputStr}`);
-
     parseFile(inputStr, outputStr);
     if (allFileNames > 1) {
         generateIndexHtmlFile(allFileNames, outputStr);
@@ -71,6 +69,10 @@ function makeOutputFolder(outputDir) {
 function parseFile(inputStr, outputStr) {
     // Get the filename from the full pathname.
     const fileName = path.basename(inputStr);
+
+    if (outputStr.length == 0) {
+        outputStr = dist_path;
+    }
 
     if (fs.existsSync(inputStr) && fs.existsSync(outputStr))
     {
