@@ -1,6 +1,0 @@
-This is a Test too
-
-
-Doggies!
-
-This file was inside a sub directory.

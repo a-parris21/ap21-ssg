@@ -1,6 +1,0 @@
-This is also a Test
-
-
-Cat.
-
-This file was inside a sub directory.

@@ -1,0 +1,7 @@
+{
+    "input": "./input_data/Sherlock-Holmes-Selected-Stories/Silver Blaze.txt",
+    "output": "./dist",
+    "stylesheet": "https://cdn.delivr.net/npm/water.css@2/out/water.css",
+    "lang": "fr"
+}
+  
