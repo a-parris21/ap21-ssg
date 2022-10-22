@@ -1,3 +1,4 @@
+// could, instead of calling read and write when you find a file --> instead append their names to an array -- THEN after parsing, call index and writeFile
 import fs, { stat } from 'fs';
 import path from 'path';
 import readline from 'readline';
@@ -5,7 +6,7 @@ import configStyle from './main.js';
 
 const dist_path = "./dist";
 var htmlLangAttribute = "en-CA";
-var allFileNames = new Array(String);
+var allFileNames = new Array();
 
 export function setHtmlLang(lang) {
     if (lang.length > 0)
@@ -45,7 +46,11 @@ function setOutputFolder(outputDir) {
 export function generateWebsite(inputStr, outputStr, configStyle= '')
 {
     setOutputFolder(outputStr);
-    parseFile(inputStr, outputStr);
+    parseFile(inputStr, outputStr)
+    .then((data) => { 
+        console.log(`allFileNames = ${allFileNames}`);
+        console.log(`data = ${data}`);
+    });
     if (allFileNames > 1) {
         generateIndexHtmlFile(allFileNames, outputStr);
     }
@@ -103,14 +108,14 @@ function parseFile(inputStr, outputStr) {
                 }
                 // Otherwise, if the filepath was a single file then parse it.
                 else {
+                    allFileNames.push(fileName);
                     if (path.extname(fileName) == '.txt') {
                         readFileTxt(inputStr)
                         .then((data) => {
                             writeHtmlFile(fileName, outputStr, data);
                         })
                         .catch(function (err) {
-                            console.log(err);
-                            return -1;
+                            rej(err);
                         });
                     }
                     else if (path.extname(fileName) == '.md') {
@@ -119,13 +124,13 @@ function parseFile(inputStr, outputStr) {
                             writeHtmlFile(fileName, outputStr, data);
                         })
                         .catch(function (err) {
-                            console.log(err);
-                            return -1;
+                            rej(err);
                         });
                     }
                     else {
                         console.log("Invalid file type. Cannot parse.");
                     }
+                    res(allFileNames);
                 }
             } // end else no errors
         });
@@ -218,8 +223,7 @@ function writeHtmlFile(fileName, outputDir, dataArr) {
         // Write the html file contents ('htmlStr') to the specified file path
         fs.writeFile(htmlFilePath, htmlStr, (err)=>{
             if (err) {
-                console.log(err);
-                return -1;
+                rej(err);
             }
             console.log(`File created: ${htmlFilePath}`);
         });
