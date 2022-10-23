@@ -22,6 +22,34 @@ function makeOutputFolder(outputDir) {
 	}
 }
 
+
+function setOutputFolder(outputDir) {
+    var outputPath = "./";
+    
+    if (outputDir.length > 0)
+    {
+        var temp = new String(outputDir);
+        var pathStartWithDot = new RegExp('^\.\/.*');
+        var pathStartNoDot = new RegExp('^\/.*');
+
+        if (pathStartWithDot.test(temp)) {
+            outputPath += temp.substring(2);
+        }
+        else if (pathStartNoDot.test(temp)) {
+            outputPath += temp.substring(1);
+        }
+        else {
+            outputPath = temp;
+        }
+    }
+    else
+    {
+        outputPath = new String(dist_path);
+    }
+
+    makeOutputFolder(outputPath.valueOf());
+}
+
 function parseFile(inputStr, outputStr) {
     // Get the filename from the full pathname.
     const fileName = path.basename(inputStr);
@@ -328,33 +356,6 @@ export function setHtmlLang(lang) {
     }
 }
 
-function setOutputFolder(outputDir) {
-    var outputPath = "./";
-    
-    if (outputDir.length > 0)
-    {
-        var temp = new String(outputDir);
-        var pathStartWithDot = new RegExp('^\.\/.*');
-        var pathStartNoDot = new RegExp('^\/.*');
-
-        if (pathStartWithDot.test(temp)) {
-            outputPath += temp.substring(2);
-        }
-        else if (pathStartNoDot.test(temp)) {
-            outputPath += temp.substring(1);
-        }
-        else {
-            outputPath = temp;
-        }
-    }
-    else
-    {
-        outputPath = new String(dist_path);
-    }
-
-    makeOutputFolder(outputPath.valueOf());
-}
-
 export function generateWebsite(inputStr, outputStr, configStyle= '')
 {
     setOutputFolder(outputStr);
@@ -364,4 +365,9 @@ export function generateWebsite(inputStr, outputStr, configStyle= '')
     }
 
     return 0;
+}
+
+
+
+function parseFileDebugging() {
 }
