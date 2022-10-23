@@ -7,51 +7,6 @@ const dist_path = "./dist";
 var htmlLangAttribute = "en-CA";
 var allFileNames = new Array(String);
 
-export function setHtmlLang(lang) {
-    if (lang.length > 0)
-    {
-        var language = new String(lang);
-        htmlLangAttribute = language;
-    }
-}
-
-function setOutputFolder(outputDir) {
-    var outputPath = "./";
-    
-    if (outputDir.length > 0)
-    {
-        var temp = new String(outputDir);
-        var pathStartWithDot = new RegExp('^\.\/.*');
-        var pathStartNoDot = new RegExp('^\/.*');
-
-        if (pathStartWithDot.test(temp)) {
-            outputPath += temp.substring(2);
-        }
-        else if (pathStartNoDot.test(temp)) {
-            outputPath += temp.substring(1);
-        }
-        else {
-            outputPath = temp;
-        }
-    }
-    else
-    {
-        outputPath = new String(dist_path);
-    }
-
-    makeOutputFolder(outputPath.valueOf());
-}
-
-export function generateWebsite(inputStr, outputStr, configStyle= '')
-{
-    setOutputFolder(outputStr);
-    parseFile(inputStr, outputStr);
-    if (allFileNames > 1) {
-        generateIndexHtmlFile(allFileNames, outputStr);
-    }
-
-    return 0;
-}
 
 function makeOutputFolder(outputDir) {
     // If the /dist directory exists, remove the folder and all of its contents
@@ -363,4 +318,50 @@ function readFileMd(filePath) {
 
         res(linesArr);
     });
+}
+
+export function setHtmlLang(lang) {
+    if (lang.length > 0)
+    {
+        var language = new String(lang);
+        htmlLangAttribute = language;
+    }
+}
+
+function setOutputFolder(outputDir) {
+    var outputPath = "./";
+    
+    if (outputDir.length > 0)
+    {
+        var temp = new String(outputDir);
+        var pathStartWithDot = new RegExp('^\.\/.*');
+        var pathStartNoDot = new RegExp('^\/.*');
+
+        if (pathStartWithDot.test(temp)) {
+            outputPath += temp.substring(2);
+        }
+        else if (pathStartNoDot.test(temp)) {
+            outputPath += temp.substring(1);
+        }
+        else {
+            outputPath = temp;
+        }
+    }
+    else
+    {
+        outputPath = new String(dist_path);
+    }
+
+    makeOutputFolder(outputPath.valueOf());
+}
+
+export function generateWebsite(inputStr, outputStr, configStyle= '')
+{
+    setOutputFolder(outputStr);
+    parseFile(inputStr, outputStr);
+    if (allFileNames > 1) {
+        generateIndexHtmlFile(allFileNames, outputStr);
+    }
+
+    return 0;
 }
