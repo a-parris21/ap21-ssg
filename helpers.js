@@ -1,5 +1,5 @@
 // could, instead of calling read and write when you find a file --> instead append their names to an array -- THEN after parsing, call index and writeFile
-import fs, { stat } from 'fs';
+import fs from 'fs';
 import path from 'path';
 import readline from 'readline';
 import configStyle from './main.js';
