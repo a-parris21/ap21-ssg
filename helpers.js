@@ -1,12 +1,19 @@
-// could, instead of calling read and write when you find a file --> instead append their names to an array -- THEN after parsing, call index and writeFile
-import fs from 'fs';
+import fs, { stat } from 'fs';
 import path from 'path';
 import readline from 'readline';
 import configStyle from './main.js';
 
 const dist_path = "./dist";
 var htmlLangAttribute = "en-CA";
-var allFileNames = new Array();
+var allFileNames = new Array(String);
+
+export function setHtmlLang(lang) {
+    if (lang.length > 0)
+    {
+        var language = new String(lang);
+        htmlLangAttribute = language;
+    }
+}
 
 function setOutputFolder(outputDir) {
     var outputPath = "./";
@@ -33,6 +40,17 @@ function setOutputFolder(outputDir) {
     }
 
     makeOutputFolder(outputPath.valueOf());
+}
+
+export function generateWebsite(inputStr, outputStr, configStyle= '')
+{
+    setOutputFolder(outputStr);
+    parseFile(inputStr, outputStr);
+    if (allFileNames > 1) {
+        generateIndexHtmlFile(allFileNames, outputStr);
+    }
+
+    return 0;
 }
 
 function makeOutputFolder(outputDir) {
@@ -85,8 +103,6 @@ function parseFile(inputStr, outputStr) {
                 }
                 // Otherwise, if the filepath was a single file then parse it.
                 else {
-                    allFileNames.push(fileName);
-
                     if (path.extname(fileName) == '.txt') {
                         readFileTxt(inputStr)
                         .then((data) => {
@@ -94,6 +110,7 @@ function parseFile(inputStr, outputStr) {
                         })
                         .catch(function (err) {
                             console.log(err);
+                            return -1;
                         });
                     }
                     else if (path.extname(fileName) == '.md') {
@@ -103,6 +120,7 @@ function parseFile(inputStr, outputStr) {
                         })
                         .catch(function (err) {
                             console.log(err);
+                            return -1;
                         });
                     }
                     else {
@@ -111,7 +129,7 @@ function parseFile(inputStr, outputStr) {
                 }
             } // end else no errors
         });
-    }
+	}
     else {
         if (!fs.existsSync(inputStr)) {
             console.log(`Input path <${inputStr}> does not exist.`);
@@ -200,7 +218,8 @@ function writeHtmlFile(fileName, outputDir, dataArr) {
         // Write the html file contents ('htmlStr') to the specified file path
         fs.writeFile(htmlFilePath, htmlStr, (err)=>{
             if (err) {
-                rej(err);
+                console.log(err);
+                return -1;
             }
             console.log(`File created: ${htmlFilePath}`);
         });
@@ -286,6 +305,17 @@ function generateHtmlPage(title, paragraphs, configStyle) {
     return str;
 }
 
+// Accepts the name of a file as a string literal. Returns TRUE if it is a .txt file, else returns FALSE.
+function isTxtFile(fileName) {
+    var r = false;
+
+    if (path.extname(fileName) = ".txt") {
+        r = true;
+    }
+
+    return r;
+}
+
 // Accepts the name of a file as a string literal. Returns the filename without the .txt extenstion.
 function getFileNameNoExt(fileName) {
     var str = new String();
@@ -333,25 +363,4 @@ function readFileMd(filePath) {
 
         res(linesArr);
     });
-}
-
-export function setHtmlLang(lang) {
-    if (lang.length > 0)
-    {
-        var language = new String(lang);
-        htmlLangAttribute = language;
-    }
-}
-
-export function generateWebsite(inputStr, outputStr, configStyle= '')
-{
-    setOutputFolder(outputStr);
-    parseFile(inputStr, outputStr); 
-    console.log(`allFileNames = ${allFileNames}`);
-
-    if (allFileNames > 1) {
-        generateIndexHtmlFile(allFileNames, outputStr);
-    }
-
-    return 0;
 }
