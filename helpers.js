@@ -8,14 +8,6 @@ const dist_path = "./dist";
 var htmlLangAttribute = "en-CA";
 var allFileNames = new Array();
 
-export function setHtmlLang(lang) {
-    if (lang.length > 0)
-    {
-        var language = new String(lang);
-        htmlLangAttribute = language;
-    }
-}
-
 function setOutputFolder(outputDir) {
     var outputPath = "./";
     
@@ -41,19 +33,6 @@ function setOutputFolder(outputDir) {
     }
 
     makeOutputFolder(outputPath.valueOf());
-}
-
-export function generateWebsite(inputStr, outputStr, configStyle= '')
-{
-    setOutputFolder(outputStr);
-    parseFile(inputStr, outputStr); 
-    console.log(`allFileNames = ${allFileNames}`);
-
-    if (allFileNames > 1) {
-        generateIndexHtmlFile(allFileNames, outputStr);
-    }
-
-    return 0;
 }
 
 function makeOutputFolder(outputDir) {
@@ -354,4 +333,25 @@ function readFileMd(filePath) {
 
         res(linesArr);
     });
+}
+
+export function setHtmlLang(lang) {
+    if (lang.length > 0)
+    {
+        var language = new String(lang);
+        htmlLangAttribute = language;
+    }
+}
+
+export function generateWebsite(inputStr, outputStr, configStyle= '')
+{
+    setOutputFolder(outputStr);
+    parseFile(inputStr, outputStr); 
+    console.log(`allFileNames = ${allFileNames}`);
+
+    if (allFileNames > 1) {
+        generateIndexHtmlFile(allFileNames, outputStr);
+    }
+
+    return 0;
 }
