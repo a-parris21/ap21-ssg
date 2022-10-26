@@ -305,17 +305,6 @@ function generateHtmlPage(title, paragraphs, configStyle) {
     return str;
 }
 
-// Accepts the name of a file as a string literal. Returns TRUE if it is a .txt file, else returns FALSE.
-function isTxtFile(fileName) {
-    var r = false;
-
-    if (path.extname(fileName) = ".txt") {
-        r = true;
-    }
-
-    return r;
-}
-
 // Accepts the name of a file as a string literal. Returns the filename without the .txt extenstion.
 function getFileNameNoExt(fileName) {
     var str = new String();
