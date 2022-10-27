@@ -52,16 +52,16 @@ export function generateWebsite(inputStr, outputStr, configStyle= '')
 
     if (debug) {
         console.log(debug);
-        var array = new Array();
-        var x = parseFileDEBUG(inputStr, outputStr, array);
-        console.log("x = ", x);
-        console.log("array = ", array);
-        console.log("testGlobalArray = ", testGlobalArray);
+        var originalArray = new Array();
+        var returnedArray = parseFileDEBUG(inputStr, outputStr, originalArray);
+        console.log("returnedArray = ", returnedArray);
+        console.log("array = ", originalArray);
     }
     else {
         console.log(debug);
         parseFile(inputStr, outputStr);
     }
+    
     if (allFileNames > 1) {
         generateIndexHtmlFile(allFileNames, outputStr);
     }
