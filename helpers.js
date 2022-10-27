@@ -3,6 +3,9 @@ import path from 'path';
 import readline from 'readline';
 import configStyle from './main.js';
 
+// might have to put a pin in the index file thing and just do something else honestly
+// since i can't get this fixed and i'm already overdue
+
 const debug = true;
 
 const dist_path = "./dist";
