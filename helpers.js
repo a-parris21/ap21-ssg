@@ -58,10 +58,15 @@ export function generateWebsite(inputStr, outputStr, configStyle= '')
     if (debug)
     {
         console.log(debug);
-        var originalArray = new Array();
+        /*var originalArray = new Array();
         var returnedArray = parseFileDEBUG(inputStr, outputStr, originalArray);
         console.log("returnedArray = ", returnedArray);
-        console.log("array = ", originalArray);
+        console.log("array = ", originalArray);*/
+        parseFile2(inputStr, outputStr).then((outputDir) =>
+        {
+            console.log(`outputDir = ${outputDir}`);
+            getGeneratedFiles(outputDir);
+        });
     }
     else
     {
@@ -429,8 +434,9 @@ function getGeneratedFiles (dir) {
     // If 'dir' exists
     if (fs.existsSync(dir))
     {
+        console.log(`${dir} exists.`);
         // Check if 'dir' is a folder.
-        fs.lstat(inputStr, (err, stats) =>
+        fs.lstat(dir, (err, stats) =>
         {
             if (err)
             {
@@ -441,11 +447,13 @@ function getGeneratedFiles (dir) {
             {
                 if (stats.isDirectory())
                 {
+                    console.log(`${dir} is a dir.`);
                     // Read each file in the directory.
-                    fs.readdir(inputStr, (err, files) =>
+                    fs.readdir(dir, (err, files) =>
                     {
                         if (files.length > 0)
                         {
+                            console.log(`files = ${files}`);
                             files.forEach((oneFile) =>
                             {
                                 fileNames.push(oneFile);
@@ -453,14 +461,12 @@ function getGeneratedFiles (dir) {
                         }
                         else
                         {
-                            console.log(`${dir} is an empty directory. No files to parse.`);
+                            console.log(`${dir} is an empty directory.`);
                         }
                     });
-
-                    
                 }
             }
-        }); // fs.lstat call
+        })
     }
     return fileNames;
 }
@@ -543,4 +549,105 @@ function parseFileDEBUG(inputStr, outputStr, filesArr) {
         }
         return -1;
     }
+}
+
+function parseFile2 (inputStr, outputStr)
+{
+    return new Promise(async (res, rej) =>
+    {
+        console.log("inside parseFile2");
+        // Get the filename from the full pathname.
+        const fileName = path.basename(inputStr);
+
+        if (outputStr.length == 0)
+        {
+            outputStr = dist_path;
+        }
+
+        if (fs.existsSync(inputStr) && fs.existsSync(outputStr))
+        {
+            // Check whether the filepath is a single file or a folder.
+            fs.lstat(inputStr, (err, stats) =>
+            {
+                if (err)
+                {
+                    console.log(err);
+                    rej(-1);
+                }
+                else
+                {
+                    // If a folder was specified, parse each file individually.
+                    if (stats.isDirectory())
+                    {
+                        fs.readdir(inputStr, (err, files) =>
+                        {
+
+                            if (files.length > 0)
+                            {
+                                files.forEach((oneFile) =>
+                                {
+                                    oneFile = inputStr + '/' + oneFile;
+                                    //console.log(`Currently parsing ${oneFile}.`);
+                                    parseFile(oneFile, outputStr);
+                                    res(outputStr);
+                                });
+                            }
+                            else
+                            {
+                                console.log(`${inputStr} is an empty directory. No files to parse.`);
+                            }
+                        });
+                    }
+                    // Otherwise, if the filepath was a single file then parse it.
+                    else
+                    {
+                        if (path.extname(fileName) == '.txt')
+                        {
+                            readFileTxt(inputStr)
+                            .then((data) =>
+                            {
+                                writeHtmlFile(fileName, outputStr, data);
+                                res(outputStr);
+                            })
+                            .catch(function (err)
+                            {
+                                console.log(err);
+                                rej(-1);
+                            });
+                        }
+                        else if (path.extname(fileName) == '.md')
+                        {
+                            readFileMd(inputStr)
+                            .then((data) =>
+                            {
+                                writeHtmlFile(fileName, outputStr, data);
+                                res(outputStr);
+                            })
+                            .catch(function (err)
+                            {
+                                console.log(err);
+                                rej(-1);
+                            });
+                        }
+                        else
+                        {
+                            console.log("Invalid file type. Cannot parse.");
+                        }
+                    }
+                } // end else no errors
+            });
+        }
+        else
+        {
+            if (!fs.existsSync(inputStr))
+            {
+                console.log(`Input path <${inputStr}> does not exist.`);
+            }
+            
+            if (!fs.existsSync(outputStr))
+            {
+                console.log(`Output path <${outputStr}> does not exist.`);
+            }
+        }
+    });
 }
