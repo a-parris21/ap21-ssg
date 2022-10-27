@@ -7,7 +7,8 @@ const dist_path = "./dist";
 var htmlLangAttribute = "en-CA";
 var allFileNames = new Array(String);
 
-export function setHtmlLang(lang) {
+export function setHtmlLang(lang)
+{
     if (lang.length > 0)
     {
         var language = new String(lang);
@@ -15,7 +16,8 @@ export function setHtmlLang(lang) {
     }
 }
 
-function setOutputFolder(outputDir) {
+function setOutputFolder(outputDir)
+{
     var outputPath = "./";
     
     if (outputDir.length > 0)
@@ -24,13 +26,16 @@ function setOutputFolder(outputDir) {
         var pathStartWithDot = new RegExp('^\.\/.*');
         var pathStartNoDot = new RegExp('^\/.*');
 
-        if (pathStartWithDot.test(temp)) {
+        if (pathStartWithDot.test(temp))
+        {
             outputPath += temp.substring(2);
         }
-        else if (pathStartNoDot.test(temp)) {
+        else if (pathStartNoDot.test(temp))
+        {
             outputPath += temp.substring(1);
         }
-        else {
+        else
+        {
             outputPath = temp;
         }
     }
@@ -46,108 +51,135 @@ export function generateWebsite(inputStr, outputStr, configStyle= '')
 {
     setOutputFolder(outputStr);
     parseFile(inputStr, outputStr);
-    if (allFileNames > 1) {
+    if (allFileNames > 1)
+    {
         generateIndexHtmlFile(allFileNames, outputStr);
     }
 
     return 0;
 }
 
-function makeOutputFolder(outputDir) {
+function makeOutputFolder(outputDir)
+{
     // If the /dist directory exists, remove the folder and all of its contents
-    if (fs.existsSync(outputDir)) {
+    if (fs.existsSync(outputDir))
+    {
 		fs.rmSync(outputDir, { recursive: true, force: true });
 	}
 
     // Create a new /dist directory, if it does not already exist.
     /* Note: This IF statement may be redundant, since the /dist folder should be deleted 
        by the above code block before execution reaches this line. */
-    if (!fs.existsSync(outputDir)) {
+    if (!fs.existsSync(outputDir))
+    {
 		fs.mkdirSync(outputDir);
 	}
 }
 
-function parseFile(inputStr, outputStr) {
+function parseFile(inputStr, outputStr)
+{
     // Get the filename from the full pathname.
     const fileName = path.basename(inputStr);
 
-    if (outputStr.length == 0) {
+    if (outputStr.length == 0)
+    {
         outputStr = dist_path;
     }
 
     if (fs.existsSync(inputStr) && fs.existsSync(outputStr))
     {
         // Check whether the filepath is a single file or a folder.
-        fs.lstat(inputStr, (err, stats) => {
-            if (err) {
+        fs.lstat(inputStr, (err, stats) =>
+        {
+            if (err)
+            {
                 console.log(err);
                 return -1;
             }
-            else {
+            else
+            {
                 // If a folder was specified, parse each file individually.
-                if (stats.isDirectory()) {
-                    fs.readdir(inputStr, (err, files) => {
+                if (stats.isDirectory())
+                {
+                    fs.readdir(inputStr, (err, files) =>
+                    {
 
                         if (files.length > 0)
                         {
-                            files.forEach((oneFile) => {
+                            files.forEach((oneFile) =>
+                            {
                                 oneFile = inputStr + '/' + oneFile;
                                 //console.log(`Currently parsing ${oneFile}.`);
                                 parseFile(oneFile, outputStr);
                             });
                         }
-                        else {
+                        else
+                        {
                             console.log(`${inputStr} is an empty directory. No files to parse.`);
                         }
                     });
                 }
                 // Otherwise, if the filepath was a single file then parse it.
-                else {
-                    if (path.extname(fileName) == '.txt') {
+                else
+                {
+                    if (path.extname(fileName) == '.txt')
+                    {
                         readFileTxt(inputStr)
-                        .then((data) => {
+                        .then((data) =>
+                        {
                             writeHtmlFile(fileName, outputStr, data);
                         })
-                        .catch(function (err) {
+                        .catch(function (err)
+                        {
                             console.log(err);
                             return -1;
                         });
                     }
-                    else if (path.extname(fileName) == '.md') {
+                    else if (path.extname(fileName) == '.md')
+                    {
                         readFileMd(inputStr)
-                        .then(function (data){
+                        .then(function (data)
+                        {
                             writeHtmlFile(fileName, outputStr, data);
                         })
-                        .catch(function (err) {
+                        .catch(function (err)
+                        {
                             console.log(err);
                             return -1;
                         });
                     }
-                    else {
+                    else
+                    {
                         console.log("Invalid file type. Cannot parse.");
                     }
                 }
             } // end else no errors
         });
 	}
-    else {
-        if (!fs.existsSync(inputStr)) {
+    else
+    {
+        if (!fs.existsSync(inputStr))
+        {
             console.log(`Input path <${inputStr}> does not exist.`);
         }
         
-        if (!fs.existsSync(outputStr)) {
+        if (!fs.existsSync(outputStr))
+        {
             console.log(`Output path <${outputStr}> does not exist.`);
         }
     }
 }
 
 // Accepts the filepath as a string. Reads and parses the file line by line. Returns an HTML string generated using the file contents.
-function readFileTxt(filePath) {
-    return new Promise(async (res, rej) => {
-        const fileReadStream = readline.createInterface({input: fs.createReadStream(filePath),});
+function readFileTxt(filePath)
+{
+    return new Promise(async (res, rej) =>
+    {
+        const fileReadStream = readline.createInterface({input: fs.createReadStream(filePath)});
 
         var linesArr = new Array();
-        for await (const line of fileReadStream) {
+        for await (const line of fileReadStream)
+        {
             linesArr.push(line);
         }
 
@@ -156,8 +188,10 @@ function readFileTxt(filePath) {
 }
 
 // Accepts the contents of a file as a string literal. Creates an HTML file containing the content.
-function writeHtmlFile(fileName, outputDir, dataArr) {
-    return new Promise( (res, rej) => {
+function writeHtmlFile(fileName, outputDir, dataArr)
+{
+    return new Promise( (res, rej) =>
+    {
         var htmlFilePath = outputDir + "/" + getFileNameNoExt(fileName) + '.html';
         
         var myBuffer = ""; // Buffer to hold lines read from the file.
@@ -171,15 +205,18 @@ function writeHtmlFile(fileName, outputDir, dataArr) {
         let x = 0;
         for (let i=0; i < dataArr.length; i++)
         {
-            if (dataArr[i].length > 0) {
+            if (dataArr[i].length > 0)
+            {
                 myBuffer = dataArr[i];
                 emptyLines = 0;
             }
-            else {
+            else
+            {
                 emptyLines++;
             }
 
-            if (emptyLines == 2) {
+            if (emptyLines == 2)
+            {
                 title = myBuffer;
                 myBuffer = "";
                 emptyLines = 0;
@@ -190,11 +227,14 @@ function writeHtmlFile(fileName, outputDir, dataArr) {
         // Note that this loop will end before the last paragraph is added to the html string.
         for (let i=x+1; i < dataArr.length; i++)
         {
-            if (dataArr[i].length > 0) {
+            if (dataArr[i].length > 0)
+            {
                 myBuffer += dataArr[i] + "<br>";
             }
-            else {
-                if (myBuffer.length > 0) {
+            
+             {
+                if (myBuffer.length > 0)
+                {
                     paragraph = myBuffer;
                     htmlBody += `<p>${paragraph}</p>\n`;
                     myBuffer = "";
@@ -203,7 +243,8 @@ function writeHtmlFile(fileName, outputDir, dataArr) {
         }
 
         // Get the last paragraph.
-        if (myBuffer.length > 0) {
+        if (myBuffer.length > 0)
+        {
             paragraph = myBuffer;
             htmlBody += `<p>${paragraph}</p>\n`;
             myBuffer = "";
@@ -216,8 +257,10 @@ function writeHtmlFile(fileName, outputDir, dataArr) {
         const htmlStr = generateHtmlPage(title, htmlBody, configStyle);
 
         // Write the html file contents ('htmlStr') to the specified file path
-        fs.writeFile(htmlFilePath, htmlStr, (err)=>{
-            if (err) {
+        fs.writeFile(htmlFilePath, htmlStr, (err) =>
+        {
+            if (err)
+            {
                 console.log(err);
                 return -1;
             }
@@ -229,7 +272,8 @@ function writeHtmlFile(fileName, outputDir, dataArr) {
 }
 
 // Generates the index.html file.
-function generateIndexHtmlFile(filenames, outputDir, configStyle) {
+function generateIndexHtmlFile(filenames, outputDir, configStyle)
+{
     const indexFilePath = outputDir + "/index.html";
     const indexTitle = "AP21 SSG";
 
@@ -245,7 +289,8 @@ function generateIndexHtmlFile(filenames, outputDir, configStyle) {
     <body>`;
     
     // Create an unordered list of hyperlinks for each of the filenames in the array.
-    for (let i=0; i < filenames.length; i++) {
+    for (let i=0; i < filenames.length; i++)
+    {
         htmlStr += 
         `<li><ul>
         <a href="${outputDir}/${filenames[i]}.html">${filenames[i]}</a>
@@ -256,8 +301,10 @@ function generateIndexHtmlFile(filenames, outputDir, configStyle) {
     htmlStr += `</body></html>`;
 
     // Write the html file contents ('htmlStr') to the specified file path
-    fs.writeFile(indexFilePath, htmlStr, (err) => {
-        if (err) {
+    fs.writeFile(indexFilePath, htmlStr, (err) =>
+    {
+        if (err)
+        {
             console.log(err);
             return -1;
         }
@@ -266,7 +313,8 @@ function generateIndexHtmlFile(filenames, outputDir, configStyle) {
 }
 
 // Generates the HTML string for a webpage for a single file.
-function generateHtmlPage(title, paragraphs, configStyle) {
+function generateHtmlPage(title, paragraphs, configStyle)
+{
     if(configStyle) 
     {
 
@@ -306,10 +354,12 @@ function generateHtmlPage(title, paragraphs, configStyle) {
 }
 
 // Accepts the name of a file as a string literal. Returns TRUE if it is a .txt file, else returns FALSE.
-function isTxtFile(fileName) {
+function isTxtFile(fileName)
+{
     var r = false;
 
-    if (path.extname(fileName) = ".txt") {
+    if (path.extname(fileName) = ".txt")
+    {
         r = true;
     }
 
@@ -317,7 +367,8 @@ function isTxtFile(fileName) {
 }
 
 // Accepts the name of a file as a string literal. Returns the filename without the .txt extenstion.
-function getFileNameNoExt(fileName) {
+function getFileNameNoExt(fileName)
+{
     var str = new String();
     str = fileName;
     
@@ -339,7 +390,8 @@ function getFileNameNoExt(fileName) {
     Expected HTML Output:       "This <b>is</b> a <b>cat</b>." 
     Actual HTML Output:         "This <b>is** a **cat</b>." 
 */
-function parseMarkdown(mdStr) {
+function parseMarkdown(mdStr)
+{
     const mdBold = /\*\*(.*)\*\*/gim;       // reg expression for bold syntax
     const mdInlineCode = /\`(.*)\`/gim;     // reg exp for in-line code syntax
     const mdHr = /^(\s*)\-\-\-(\s*$)/gm;      // reg exp for horizontal rule
@@ -352,12 +404,15 @@ function parseMarkdown(mdStr) {
 }
 
 // Modified version of 'readFileTxt()' which calls the 'parseMarkdown' function when pushing to the 'linesArr'.
-function readFileMd(filePath) {
-    return new Promise(async (res, rej) => {
+function readFileMd(filePath)
+{
+    return new Promise(async (res, rej) =>
+    {
         const fileReadStream = readline.createInterface({input: fs.createReadStream(filePath),});
 
         var linesArr = new Array();
-        for await (const line of fileReadStream) {
+        for await (const line of fileReadStream)
+        {
             linesArr.push(parseMarkdown(line)); // parse 'line' before pushing it to 'linesArr'
         }
 
