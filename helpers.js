@@ -9,6 +9,8 @@ const dist_path = "./dist";
 var htmlLangAttribute = "en-CA";
 var allFileNames = new Array(String);
 
+var testGlobalArray = [];
+
 export function setHtmlLang(lang) {
     if (lang.length > 0)
     {
@@ -49,9 +51,15 @@ export function generateWebsite(inputStr, outputStr, configStyle= '')
     setOutputFolder(outputStr);
 
     if (debug) {
-        parseFileDEBUG(inputStr, outputStr, 0);
+        console.log(debug);
+        var array = new Array();
+        var x = parseFileDEBUG(inputStr, outputStr, array);
+        console.log("x = ", x);
+        console.log("array = ", array);
+        console.log("testGlobalArray = ", testGlobalArray);
     }
     else {
+        console.log(debug);
         parseFile(inputStr, outputStr);
     }
     if (allFileNames > 1) {
@@ -114,7 +122,7 @@ function parseFile(inputStr, outputStr) {
                     if (path.extname(fileName) == '.txt') {
                         readFileTxt(inputStr)
                         .then((data) => {
-                            writeHtmlFile(fileName, outputStr, data);
+                            writeHtmlFile(fileName, outputStr, data)
                         })
                         .catch(function (err) {
                             console.log(err);
@@ -363,14 +371,38 @@ function readFileMd(filePath) {
 }
 
 
+// This function searches the folder stated in its parameter and returns an array containing all the filenames included in that folder.
+function getGeneratedFiles (dir) {
+    if (fs.existsSync(inputStr) && fs.existsSync(outputStr))
+    {
+        // Check whether the filepath is a single file or a folder.
+        fs.lstat(inputStr, (err, stats) => {
+            if (err) {
+                console.log(err);
+                return -1;
+            }
+            else {
+            }
+        }); // fs.lstat call
+    }
+}
 
 
-function parseFileDEBUG(inputStr, outputStr, counter) {
+
+
+
+
+
+
+
+
+
+
+
+
+function parseFileDEBUG(inputStr, outputStr, filesArr) {
     // Get the filename from the full pathname.
     const fileName = path.basename(inputStr);
-
-    var y = 0;
-    y += counter;
 
     if (outputStr.length == 0) {
         outputStr = dist_path;
@@ -388,59 +420,61 @@ function parseFileDEBUG(inputStr, outputStr, counter) {
                 // If a folder was specified, parse each file individually.
                 if (stats.isDirectory()) {
                     fs.readdir(inputStr, (err, files) => {
-
-                        if (files.length > 0)
+                        if (err) {
+                            console.log(err);
+                            return -1;
+                        }
+                        else if (files.length > 0)
                         {
                             files.forEach((oneFile) => {
                                 oneFile = inputStr + '/' + oneFile;
-                                //console.log(`Currently parsing ${oneFile}.`);
-                                y = parseFile(oneFile, outputStr, y);
+                                console.log(`Found ${oneFile}. Calling 'parse' on this file.`);
+                                
+                                //console.log(`filesArr = ${filesArr}`);
+                                /*var fileNamesArr = new Array();
+                                fileNamesArr = parseFileDEBUG(oneFile, outputStr, fileNamesArr);
+                                for (let i=0; i < filesArr.length; i++) {
+                                    filesArr.push(fileNamesArr[i]);
+                                }
+                                console.log(`fileNamesArr = ${fileNamesArr}`);*/
+                                //console.log(`after copy: filesArr = ${filesArr}`);
+                                filesArr = parseFileDEBUG(oneFile, outputStr, filesArr);
                             });
                         }
                         else {
                             console.log(`${inputStr} is an empty directory. No files to parse.`);
+                            return filesArr;
                         }
                     });
                 }
                 // Otherwise, if the filepath was a single file then parse it.
                 else {
-                    y += 1;
-                    if (path.extname(fileName) == '.txt') {
-                        readFileTxt(inputStr)
-                        .then((data) => {
-                            writeHtmlFile(fileName, outputStr, data);
-                        })
-                        .catch(function (err) {
-                            console.log(err);
-                            return -1;
-                        });
-                    }
-                    else if (path.extname(fileName) == '.md') {
-                        readFileMd(inputStr)
-                        .then(function (data){
-                            writeHtmlFile(fileName, outputStr, data);
-                        })
-                        .catch(function (err) {
-                            console.log(err);
-                            return -1;
-                        });
+                    console.log(`Currently parsing ${fileName}.`);
+                    if ((path.extname(fileName) == '.txt') || (path.extname(fileName) == '.md')) {
+                        filesArr.push(fileName);
+                        console.log(`filesArr = ${filesArr}`);
+                        if (filesArr.length == 4) {
+                            testGlobalArray = filesArr;
+                        }
+                        return filesArr;
                     }
                     else {
                         console.log("Invalid file type. Cannot parse.");
+                        return -1;
                     }
                 }
-            } // end else no errors
-        });
-	}
+            }
+        }); // fs.lstat call
+
+        return filesArr;
+	} // if input & output paths both exist
     else {
         if (!fs.existsSync(inputStr)) {
             console.log(`Input path <${inputStr}> does not exist.`);
         }
-        
         if (!fs.existsSync(outputStr)) {
             console.log(`Output path <${outputStr}> does not exist.`);
         }
+        return -1;
     }
-
-    return y;
 }
