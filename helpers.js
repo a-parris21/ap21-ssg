@@ -64,6 +64,7 @@ export function generateWebsite(inputStr, outputStr, configStyle= '')
         console.log("array = ", originalArray);*/
         parseFile2(inputStr, outputStr).then((outputDir) =>
         {
+		// try putting a res() command inside the writeFile function if i don't already have one
             console.log(`outputDir = ${outputDir}`);
             getGeneratedFiles(outputDir);
         });
