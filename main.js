@@ -1,6 +1,6 @@
 // #! /usr/bin/env node
 
-import { generateWebsite, setHtmlLang } from './helpers.js';
+import { generateWebsite } from './helpers.js';
 import { Command } from 'commander';
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
@@ -28,8 +28,7 @@ const options = program.opts();
 
 if(options.config) 
 {
-    generateWebsite(`${configInput}`, `${configOutput}`, `${configStyle || ''}`);
-    setHtmlLang(`${configLang}`);
+    generateWebsite(`${configInput}`, `${configOutput}`, `${configLang}`, `${configStyle || ''}`);
 }
 
 if(!options.config) 
@@ -47,19 +46,15 @@ if(!options.config)
 
     if (options.input)
     {
-        if (options.output) {
-            generateWebsite(`${options.input} `, `${options.output}`);
+        if (options.output)
+        {
+            generateWebsite(`${options.input}`, `${options.output}`, `${options.lang || ''}`);
         }
-        else {
-            generateWebsite(`${options.input}`, '');
+        else
+        {
+            generateWebsite(`${options.input}`, '', `${options.lang || ''}`);
         }
     }
-
-    if (options.lang)
-    {
-        setHtmlLang(`${options.lang}`);
-    }
-
 }
 
 
