@@ -425,8 +425,11 @@ function readFileMd(filePath)
 
 // This function searches the folder stated in its parameter and returns an array containing all the filenames included in that folder.
 function getGeneratedFiles (dir) {
-    if (fs.existsSync(outputStr))
+    var fileNames = new Array();
+    // If 'dir' exists
+    if (fs.existsSync(dir))
     {
+        // Check if 'dir' is a folder.
         fs.lstat(inputStr, (err, stats) =>
         {
             if (err)
@@ -438,36 +441,28 @@ function getGeneratedFiles (dir) {
             {
                 if (stats.isDirectory())
                 {
+                    // Read each file in the directory.
                     fs.readdir(inputStr, (err, files) =>
                     {
-                        if (err)
-                        {
-                            console.log(err);
-                            return -1;
-                        }
-                        else if (files.length > 0)
+                        if (files.length > 0)
                         {
                             files.forEach((oneFile) =>
                             {
-                                oneFile = inputStr + '/' + oneFile;
-                                console.log(`Found ${oneFile}. Calling 'parse' on this file.`);
-                                
-                                //console.log(`filesArr = ${filesArr}`);
-                                /*var fileNamesArr = new Array();
-                                fileNamesArr = parseFileDEBUG(oneFile, outputStr, fileNamesArr);
-                                for (let i=0; i < filesArr.length; i++) {
-                                    filesArr.push(fileNamesArr[i]);
-                                }
-                                console.log(`fileNamesArr = ${fileNamesArr}`);*/
-                                //console.log(`after copy: filesArr = ${filesArr}`);
-                                filesArr = parseFileDEBUG(oneFile, outputStr, filesArr);
+                                fileNames.push(oneFile);
                             });
                         }
+                        else
+                        {
+                            console.log(`${dir} is an empty directory. No files to parse.`);
+                        }
                     });
+
+                    
                 }
             }
         }); // fs.lstat call
     }
+    return fileNames;
 }
 
 
